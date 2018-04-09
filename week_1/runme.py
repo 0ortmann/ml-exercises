@@ -28,6 +28,8 @@ plt.close()
 for degree in range(1,5):
     fit = np.polyfit(arr[:,0], arr[:,1], deg=degree)
     fit_fn = np.poly1d(fit)
+
+    ## predict for y = 10000
     y = 10000
     root = (fit_fn - y).roots
     print("Assuming degree for polynomial fitting {}. Predict time for y=10000: {}".format(degree, root[0]))
