@@ -87,4 +87,39 @@ print '\n test statistics'
 base_statistics(test)
 
 
+#hilbert matrix
+#create hilbert matrix
+def hilbert(n):
+    v = np.arange(1, n + 1) + np.arange(0, n)[:, np.newaxis]
+    return 1. / v
+    
+#print matrices for n 1-30    
+#for n in range(1, 31):
+    #print "HilbertMatrix({}) == \n".format(n) , hilbert(n)
+    
+#solve linear equation
+for n in [1, 2, 3, 5, 10, 15, 20, 30, 50, 100]:
+    b = np.ones(n)
+    h = hilbert(n)
+    x = np.linalg.solve(h, b)
+    print "hilbert", h
+    print "Solution of linear equation of HilbertMatrix({})*(1..1) ==\n {}".format(n,  x)
+    print "Verify solution"
+    print "{}".format(np.dot(h,x) - b)
 
+#we don't trust the solution! is has marginal differences in the space 10^-8
+
+'''
+What is special about this matrices?
+
+    - The values in the hilbert matrix are directly dependent of the indices of the matrix itself (row, column).
+    - We are using a quadratic hilbert matrix, thus the matrix is symmetrical along the diagonal.
+      The top right value in a hilber matrix of size k would always by 1/k, like the bottom left value.
+      The top left value is always 1 and the bottom right value is always 1/(2k-1). 
+      A hilbert matrix, only considering one side of the diagonal thus follows the almost exact half of 
+      the harmonic series. 
+    - values in the verification matrix-dot-product are the exact computations 
+      of the hilbertmatrix * solution-vector - target vector. Thus any differences to 0 can 
+      be considered as error of the numpy library.
+      
+'''
