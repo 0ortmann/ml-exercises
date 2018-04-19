@@ -96,7 +96,7 @@ def base_statistics(dataframe):
     print 'mean:', dataframe.mean()
 
 #call for full dataset
-#print '\nfull statistics'
+print '\nfull statistics'
 base_statistics(housing_data)
 
 #c) plot histograms for all dataset columns except the last (nominal value)
@@ -143,12 +143,12 @@ test = housing_data[~mask]
 #calculate histograms and base statistics for training and test set
 #print base statistics for training and test sets
 
-#print '\n train statistics:'
+print '\n train statistics:'
 base_statistics(train)
 create_hists(train, "train")
 
 #call for test set
-#print '\n test statistics'
+print '\n test statistics'
 base_statistics(test)
 create_hists(test, "test")
 
@@ -220,7 +220,7 @@ def calc_kNN(test_k, trainingset, testset, distance_function=euclid_allfeat, los
     for k in test_k:
         print "calculating kNN for k =", k
         m_loss = 0
-        # note: the following takes some time, unless test set is small (which is why we only use the test set here)
+        # note: the following takes some time
         for index, point in testset.iterrows():
             prediction, loss = kNN(trainingset, point, k, distance_function, loss_function)
             #print each prediction and loss 
@@ -244,10 +244,12 @@ def plot_error(test_k, errors, name):
 
 
 #predict on training set, calculate training error (uncomment to run)
+#run at your own risk, might take a LONG time 
 #errs_train = calc_kNN(k_values, train, train)
 #plot_error(k_values, errs_train, "_euclideandist_l2loss")
 
 #predict on test set, calculate test error
+#we ran this because it finishes in reasonable time to find out about which k to use
 errs_test = calc_kNN(k_values, train, test)
 plot_error(k_values, errs_test, "_euclideandist_l2loss")
 
@@ -268,5 +270,6 @@ to choose an adequate value for k (with the lowest squared error)
 Since our computational power is limited, we used the test set (for its smaller sample size) to get some 
 information about the different mean squared errors for values of k.
 
+k = 17 produces the lowest mean squared error when we predict on values from the test set
 '''
 
