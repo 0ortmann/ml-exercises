@@ -4,6 +4,8 @@ import numpy as np
 import scipy as sp
 from scipy import io as sio
 import matplotlib.pyplot as plt
+from sklearn import neighbors
+from sklearn.metrics import accuracy_score
 
 ## assignment 03.1
 
@@ -96,8 +98,7 @@ plt.savefig('plots/random_values_in_circle.png', block=True)
 
 
 
-###### assignment 03.2
-
+##### assignment 03.2
 print('Assignment 2')
 
 ## a) access keys
@@ -187,3 +188,46 @@ plt.close()
 ## finally it rotates the matrix back to its original position (V)
 ## the result is matrix which strechted and rotated while keeping the x-axis direction
 
+
+###### assignment 03.2
+
+## a) read dataset and convert entries in matrices to double
+test_file = sio.loadmat('./usps/usps_test.mat')
+test_data = test_file['test_data'].astype('double')
+test_label = test_file['test_label'].astype('double')
+
+train_file = sio.loadmat('./usps/usps_train.mat')
+train_data = train_file['train_data'].astype('double')
+train_label = train_file['train_label'].astype('double')
+
+## b) plot some samples from the data
+for i in range(10):
+    plt.figure('sample {} handwritten digits'.format(i*1000))
+    plt.imshow(train_data[i*1000].reshape(16,16), cmap='gray')
+    plt.savefig('plots/sample_handwritten_data_{}.png'.format(i))
+
+## c) kNN
+
+def kNN(k, compare_data):
+    knn = neighbors.KNeighborsClassifier(n_neighbors=k)
+    knn.fit(train_data, train_label.ravel())
+    return knn.predict(compare_data)
+
+## call kNN for different k, plot errors
+
+for k in [1, 3, 5]:
+    predicted_test_label = kNN(k, test_data)
+    #test_error = accuracy_score(predicted_test_label, test_label)
+    
+    predicted_train_label = kNN(k, train_data)
+    #train_error = accuracy_score(predicted_train_label, train_label)
+
+    plt.figure('kNN k={} training errors'.format(k))
+    plt.plot(np.arange(len(predicted_train_label)), predicted_train_label, color='#ee0000')
+    plt.plot(np.arange(len(train_label)), train_label, color='#000000')
+    plt.savefig('plots/kNN_k={}_train_errors'.format(k))
+
+    plt.figure('kNN k={} test errors'.format(k))
+    plt.plot(np.arange(len(predicted_test_label)), predicted_test_label, color='#ee0000')
+    plt.plot(np.arange(len(test_label)), test_label, color='#000000')
+    plt.savefig('plots/kNN_k={}_test_errors'.format(k))
