@@ -5,7 +5,10 @@ import scipy as sp
 from scipy import io as sio
 import matplotlib.pyplot as plt
 from sklearn import neighbors
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix
+from matplotlib import cm
+
+import itertools
 
 ## assignment 03.1
 
@@ -212,25 +215,35 @@ def kNN(k, t_data, t_label, compare_data):
     knn.fit(t_data, t_label.ravel())
     return knn.predict(compare_data)
 
+#l1_loss returns 1 if equal, 0 if not
+def l_1(y_true, y_pred):
+    return int(y_true == y_pred)
+
+def plot_conf_matrix(matrix_a, matrix_b, title, file_name):
+    confusion = confusion_matrix(matrix_a, matrix_b)
+    plt.figure(title)
+
+    thresh = confusion.max() / 2.
+    for i, j in itertools.product(range(confusion.shape[0]), range(confusion.shape[1])):
+        plt.text(j, i, format(confusion[i, j], 'd'),
+                 horizontalalignment='center',
+                 color='white' if confusion[i, j] > thresh else 'black')
+    plt.imshow(confusion, interpolation='nearest', cmap=cm.get_cmap('tab20b'))
+    plt.colorbar()
+    plt.tight_layout()
+    plt.ylabel('true value')
+    plt.xlabel('predicted value')
+    plt.savefig(file_name)
+
+
+
 ## call kNN for different k, plot errors
-
-for k in [1, 3, 5, 7]:
+for k in [1, 3]:
     predicted_test_label = kNN(k, train_data, train_label, test_data)
-    #test_error = accuracy_score(predicted_test_label, test_label)
-
     predicted_train_label = kNN(k, train_data, train_label, train_data)
-    #train_error = accuracy_score(predicted_train_label, train_label)
 
-    plt.figure('kNN k={} training errors'.format(k))
-    plt.plot(np.arange(len(predicted_train_label)), predicted_train_label, color='#ee0000')
-    plt.plot(np.arange(len(train_label)), train_label, color='#000000')
-    plt.savefig('plots/kNN_k={}_train_errors'.format(k))
-
-    plt.figure('kNN k={} test errors'.format(k))
-    plt.plot(np.arange(len(predicted_test_label)), predicted_test_label, color='#ee0000')
-    plt.plot(np.arange(len(test_label)), test_label, color='#000000')
-    plt.savefig('plots/kNN_k={}_test_errors'.format(k))
-
+    plot_conf_matrix(predicted_train_label, train_label, 'kNN k={} training errors'.format(k), 'plots/kNN_k={}_train_errors'.format(k))  
+    plot_conf_matrix(predicted_test_label, test_label, 'kNN k={} test errors'.format(k), 'plots/kNN_k={}_test_errors'.format(k))
 
 ## d) classify specific digits and compare results
 
@@ -266,22 +279,10 @@ for k in [1, 3, 5, 7]:
     predicted_train_label_2_3 = kNN(k, train_2_3, train_label_2_3, train_2_3)
     predicted_train_label_3_8 = kNN(k, train_3_8, train_label_3_8, train_3_8)
 
-    plt.figure('kNN 2 & 3 with k={} training errors'.format(k))
-    plt.plot(np.arange(len(predicted_train_label_2_3)), predicted_train_label_2_3, color='#ee0000')
-    plt.plot(np.arange(len(train_label_2_3)), train_label_2_3, color='#000000')
-    plt.savefig('plots/kNN_k={}_on_2_3_train_errors'.format(k))
+    plot_conf_matrix(predicted_train_label_2_3, train_label_2_3, 'kNN 2 & 3 with k={} training errors'.format(k), 'plots/kNN_k={}_on_2_3_train_errors'.format(k))
 
-    plt.figure('kNN 2 & 3 with k={} test errors'.format(k))
-    plt.plot(np.arange(len(predicted_test_label_2_3)), predicted_test_label_2_3, color='#ee0000')
-    plt.plot(np.arange(len(test_label_2_3)), test_label_2_3, color='#000000')
-    plt.savefig('plots/kNN_k={}_on_2_3_test_errors'.format(k))
+    plot_conf_matrix(predicted_test_label_2_3, test_label_2_3, 'kNN 2 & 3 with k={} testing errors'.format(k), 'plots/kNN_k={}_on_2_3_test_errors'.format(k))
 
-    plt.figure('kNN 3 & 8 with k={} training errors'.format(k))
-    plt.plot(np.arange(len(predicted_train_label_3_8)), predicted_train_label_3_8, color='#ee0000')
-    plt.plot(np.arange(len(train_label_3_8)), train_label_3_8, color='#000000')
-    plt.savefig('plots/kNN_k={}_on_3_8_train_errors'.format(k))
+    plot_conf_matrix(predicted_train_label_3_8, train_label_3_8, 'kNN 3 & 8 with k={} training errors'.format(k), 'plots/kNN_k={}_on_3_8_train_errors'.format(k))
 
-    plt.figure('kNN 3 & 8 with k={} test errors'.format(k))
-    plt.plot(np.arange(len(predicted_test_label_3_8)), predicted_test_label_3_8, color='#ee0000')
-    plt.plot(np.arange(len(test_label_3_8)), test_label_3_8, color='#000000')
-    plt.savefig('plots/kNN_k={}_on_3_8_test_errors'.format(k))
+    plot_conf_matrix(predicted_test_label_3_8, test_label_3_8, 'kNN 3 & 8 with k={} testing errors'.format(k), 'plots/kNN_k={}_on_3_8_test_errors'.format(k))
