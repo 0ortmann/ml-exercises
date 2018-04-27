@@ -181,12 +181,11 @@ plt.plot(X[0], X[1], color='#ee8d18')
 plt.plot(a[0], a[1], color='#008d18')
 plt.savefig('plots/linear_mapping_A.png', block=True)
 plt.close()
-
-## what does the mapping do?
-## first it applies V_t, thus it rotates the matrix downwards.
-## then (D2) it stretches the matrix to double x-axis length
-## finally it rotates the matrix back to its original position (V)
-## the result is matrix which strechted and rotated while keeping the x-axis direction
+# what does the mapping do?
+# first it applies V_t, thus it rotates the matrix downwards.
+# then (D2) it stretches the matrix to double x-axis length
+# finally it rotates the matrix back to its original position (V)
+# the result is matrix which strechted and rotated while keeping the x-axis direction
 
 
 ###### assignment 03.2
@@ -208,18 +207,18 @@ for i in range(10):
 
 ## c) kNN
 
-def kNN(k, compare_data):
+def kNN(k, t_data, t_label, compare_data):
     knn = neighbors.KNeighborsClassifier(n_neighbors=k)
-    knn.fit(train_data, train_label.ravel())
+    knn.fit(t_data, t_label.ravel())
     return knn.predict(compare_data)
 
 ## call kNN for different k, plot errors
 
-for k in [1, 3, 5]:
-    predicted_test_label = kNN(k, test_data)
+for k in [1, 3, 5, 7]:
+    predicted_test_label = kNN(k, train_data, train_label, test_data)
     #test_error = accuracy_score(predicted_test_label, test_label)
-    
-    predicted_train_label = kNN(k, train_data)
+
+    predicted_train_label = kNN(k, train_data, train_label, train_data)
     #train_error = accuracy_score(predicted_train_label, train_label)
 
     plt.figure('kNN k={} training errors'.format(k))
@@ -231,3 +230,58 @@ for k in [1, 3, 5]:
     plt.plot(np.arange(len(predicted_test_label)), predicted_test_label, color='#ee0000')
     plt.plot(np.arange(len(test_label)), test_label, color='#000000')
     plt.savefig('plots/kNN_k={}_test_errors'.format(k))
+
+
+## d) classify specific digits and compare results
+
+train_2 = train_data[1000:2000]
+train_label_2 = train_label[1000:2000]
+test_2 = test_data[100:200]
+test_label_2 = test_label[100:200]
+
+train_3 = train_data[2000:3000]
+train_label_3 = train_label[2000:3000]
+test_3 = test_data[200:300]
+test_label_3 = test_label[200:300]
+
+train_8 = train_data[7000:8000]
+train_label_8 = train_label[7000:8000]
+test_8 = test_data[700:800]
+test_label_8 = test_label[700:800]
+
+train_2_3 = np.concatenate((train_2,train_3))
+train_label_2_3 = np.concatenate((train_label_2, train_label_3))
+test_2_3 = np.concatenate((test_2, test_3))
+test_label_2_3 = np.concatenate((test_label_2, test_label_3))
+
+train_3_8 = np.concatenate((train_3, train_8))
+train_label_3_8 = np.concatenate((train_label_3, train_label_8))
+test_3_8 = np.concatenate((test_3, test_8))
+test_label_3_8 = np.concatenate((test_label_3, test_label_8))
+
+for k in [1, 3, 5, 7]:
+    predicted_test_label_2_3 = kNN(k, train_2_3, train_label_2_3, test_2_3)
+    predicted_test_label_3_8 = kNN(k, train_3_8, train_label_3_8, test_3_8)
+
+    predicted_train_label_2_3 = kNN(k, train_2_3, train_label_2_3, train_2_3)
+    predicted_train_label_3_8 = kNN(k, train_3_8, train_label_3_8, train_3_8)
+
+    plt.figure('kNN 2 & 3 with k={} training errors'.format(k))
+    plt.plot(np.arange(len(predicted_train_label_2_3)), predicted_train_label_2_3, color='#ee0000')
+    plt.plot(np.arange(len(train_label_2_3)), train_label_2_3, color='#000000')
+    plt.savefig('plots/kNN_k={}_on_2_3_train_errors'.format(k))
+
+    plt.figure('kNN 2 & 3 with k={} test errors'.format(k))
+    plt.plot(np.arange(len(predicted_test_label_2_3)), predicted_test_label_2_3, color='#ee0000')
+    plt.plot(np.arange(len(test_label_2_3)), test_label_2_3, color='#000000')
+    plt.savefig('plots/kNN_k={}_on_2_3_test_errors'.format(k))
+
+    plt.figure('kNN 3 & 8 with k={} training errors'.format(k))
+    plt.plot(np.arange(len(predicted_train_label_3_8)), predicted_train_label_3_8, color='#ee0000')
+    plt.plot(np.arange(len(train_label_3_8)), train_label_3_8, color='#000000')
+    plt.savefig('plots/kNN_k={}_on_3_8_train_errors'.format(k))
+
+    plt.figure('kNN 3 & 8 with k={} test errors'.format(k))
+    plt.plot(np.arange(len(predicted_test_label_3_8)), predicted_test_label_3_8, color='#ee0000')
+    plt.plot(np.arange(len(test_label_3_8)), test_label_3_8, color='#000000')
+    plt.savefig('plots/kNN_k={}_on_3_8_test_errors'.format(k))
