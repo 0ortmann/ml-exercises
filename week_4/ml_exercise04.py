@@ -230,4 +230,28 @@ Y_pred = np.dot(X_test, w)
 avg_loss = average_loss(Y_test, Y_pred)
 
 print('The average lossL2 accross the Y_test data is:', avg_loss)
+print()
 
+## d) more dimensions in the data
+
+print('Add quadratic dimension. Fixed value for all points: 0.1')
+
+X_quadratic_train = np.insert(X_train, 1, 0.1, axis=1)
+X_quadratic_test = np.insert(X_test, 1, 0.1, axis=1)
+
+w_quadratic = least_squares(X_quadratic_train, Y_train) # learn
+Y_quadratic_pred = np.dot(X_quadratic_test, w_quadratic) # predict
+
+avg_quadratic_loss = average_loss(Y_test, Y_quadratic_pred)
+print('Quadratic dimension added. Average loss is:', avg_quadratic_loss)
+print()
+
+
+print('Add cubic dimension. Fixed value for all points: 0.85')
+X_cubic_train = np.insert(X_quadratic_train, 2, 0.85, axis=1)
+X_cubic_test = np.insert(X_quadratic_test, 2, 0.85, axis=1)
+w_cubic = least_squares(X_cubic_train, Y_train) # learn
+Y_cubic_pred = np.dot(X_cubic_test, w_cubic) # predict
+
+avg_cubic_loss = average_loss(Y_test, Y_cubic_pred)
+print('Cubic dimension added. Average loss is:', avg_cubic_loss)
