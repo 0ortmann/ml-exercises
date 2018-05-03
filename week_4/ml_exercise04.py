@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from scipy import io as sio
 import matplotlib.pyplot as plt
-
+from numpy.linalg import inv
 
 ##### assignment 1
 
@@ -201,3 +201,16 @@ plt.scatter(X_test, Y_test)
 plt.savefig('./plots/raw_testing_data')
 
 X_train = np.insert(X_train, 1, 1, axis=1)
+X_test = np.insert(X_test, 1, 1, axis=1)
+
+## b) implement least_squares and apply to training data
+
+def least_squares(X, Y):
+    X_t = X.transpose()
+    left = inv(np.dot(X_t, X))
+    right = np.dot(X_t, Y)
+    return np.dot(left, right)
+
+w = least_squares(X_train, Y_train)
+print('Calculate solution vector `w` by using own function `least_squares`. `w` = ', w)
+
