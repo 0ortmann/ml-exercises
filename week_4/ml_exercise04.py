@@ -214,3 +214,20 @@ def least_squares(X, Y):
 w = least_squares(X_train, Y_train)
 print('Calculate solution vector `w` by using own function `least_squares`. `w` = ', w)
 
+## c) squared loss
+
+def lossL2(point, point_pred):
+    return (point-point_pred)**2
+
+def average_loss(Y, Y_pred):
+    total_loss = 0
+    for entry in zip(Y, Y_pred):
+        total_loss = total_loss + lossL2(entry[0], entry[1])
+    return total_loss / len(Y)
+
+
+Y_pred = np.dot(X_test, w)
+avg_loss = average_loss(Y_test, Y_pred)
+
+print('The average lossL2 accross the Y_test data is:', avg_loss)
+
