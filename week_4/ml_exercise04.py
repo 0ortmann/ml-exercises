@@ -72,17 +72,17 @@ print('')
 prob_had_X = (x == 1).sum() / frame_length
 prob_had_X_not_vac = (x[ vacX==0 ] == 1).sum() / frame_length
 prob_had_X_with_vac = (x[ vacX==1 ] == 1).sum() / frame_length
-print('Probability to have had diseaseX in general:', prob_had_X)
-print('Probability to have had diseaseX without vaccination:', prob_had_X_not_vac)
-print('Probability to have had diseaseX with vaccination:', prob_had_X_with_vac)
+print('P(diseaseX)', prob_had_X)
+print('P(diseaseX | vacX = 0)', prob_had_X_not_vac)
+print('P(diseaseX | vacX = 1)', prob_had_X_with_vac)
 print('')
 
 prob_vac_X = (vacX == 1).sum() / frame_length
 prob_vac_X_had_X = (vacX[ x==1 ] == 1).sum() / frame_length
 prob_vac_X_had_not_X = (vacX[ x==0 ] == 1).sum() / frame_length
-print('Probability to be vaccinated against X:', prob_vac_X)
-print('Probability to be vaccinated and had X:', prob_vac_X_had_X)
-print('Probability to be vaccinated and not had X:', prob_vac_X_had_not_X)
+print('P(vacX)', prob_vac_X)
+print('P(vacX | diseaseX = 0)', prob_vac_X_had_not_X)
+print('P(vacX | diseaseX = 1)', prob_vac_X_had_X)
 print('')
 
 
@@ -92,14 +92,14 @@ prob_had_Y_age_2 = (y[ age==2 ] == 1).sum() / frame_length
 prob_had_Y_age_3 = (y[ age==3 ] == 1).sum() / frame_length
 prob_had_Y_age_4 = (y[ age==4 ] == 1).sum() / frame_length
 prob_had_Y_age_5 = (y[ age==5 ] == 1).sum() / frame_length
-print('Probability to have had Y:', prob_had_Y)
-print('Probability to have had Y from years 0-2:', prob_had_Y_age_1)
-print('Probability to have had Y from years 3-6:', prob_had_Y_age_2)
-print('Probability to have had Y from years 7-10:', prob_had_Y_age_3)
-print('Probability to have had Y from years 11-13:', prob_had_Y_age_4)
-print('Probability to have had Y from years 14-17:', prob_had_Y_age_5)
+print('P(diseaseY)', prob_had_Y)
+print('P(diseaseY | age = 1)', prob_had_Y_age_1)
+print('P(diseaseY | age = 2)', prob_had_Y_age_2)
+print('P(diseaseY | age = 3)', prob_had_Y_age_3)
+print('P(diseaseY | age = 4)', prob_had_Y_age_4)
+print('P(diseaseY | age = 5)', prob_had_Y_age_5)
 
-plt.figure('Disease Y | age {1 2 3 4}')
+plt.figure('P(diseaseY | age = 1/2/3/4)')
 probs_y = [prob_had_Y_age_1, prob_had_Y_age_2, prob_had_Y_age_3, prob_had_Y_age_4]
 plt.plot([1, 2, 3, 4], probs_y)
 plt.savefig('./plots/conditional_prob_diseaseY_age_1234.png')
@@ -110,14 +110,14 @@ prob_vacX_age_2 = (vacX[ age==2 ] == 1).sum() / frame_length
 prob_vacX_age_3 = (vacX[ age==3 ] == 1).sum() / frame_length
 prob_vacX_age_4 = (vacX[ age==4 ] == 1).sum() / frame_length
 prob_vacX_age_5 = (vacX[ age==5 ] == 1).sum() / frame_length
-print('Probability to be vaccinated', prob_vac_x)
-print('Probability to be vaccinated against X from years 0-2:', prob_vacX_age_1)
-print('Probability to be vaccinated against X from years 3-6:', prob_vacX_age_2)
-print('Probability to be vaccinated against X from years 7-10:', prob_vacX_age_3)
-print('Probability to be vaccinated against X from years 11-13:', prob_vacX_age_4)
-print('Probability to be vaccinated against X from years 14-17:', prob_vacX_age_5)
+print('P(vacX)', prob_vac_x)
+print('P(vacX | age = 1)', prob_vacX_age_1)
+print('P(vacX | age = 2)', prob_vacX_age_2)
+print('P(vacX | age = 3):', prob_vacX_age_3)
+print('P(vacX | age = 4):', prob_vacX_age_4)
+print('P(vacX | age = 5):', prob_vacX_age_5)
 
-plt.figure('Vaccinated X | age {1 2 3 4}')
+plt.figure('P(vacX | age = 1/2/3/4)')
 probs_vac_x = [prob_vacX_age_1, prob_vacX_age_2, prob_vacX_age_3, prob_vacX_age_4]
 plt.plot([1, 2, 3, 4], probs_vac_x)
 plt.savefig('./plots/conditional_prob_vacX_age_1234.png')
@@ -126,10 +126,53 @@ print('')
 prob_bike = (bike == 1).sum() / frame_length
 prob_bike_not_vac = (bike[ vacX==0 ] == 1).sum() / frame_length
 prob_bike_vac = (bike[ vacX==1 ] == 1).sum() / frame_length
-print('Probability to know how to ride a bike:', prob_bike)
-print('Probability to to know how to ride a bike and be vaccinated', prob_bike_vac)
-print('Probability to to know how to ride a bike and not to be vaccinated', prob_bike_not_vac)
+print('P(knowsToRideABike)', prob_bike)
+print('P(knowsToRideABike | vacX = 1)', prob_bike_vac)
+print('P(knowsToRideABike | vacX = 0)', prob_bike_not_vac)
+
+
+print('we can conclude from the plots: it is more likely to have had disease Y or to be vaccinated against X, for older children. With rising age, the probability to have been infected rises and the probability to be vaccinated rises.')
 print('')
 
+## e) more conditional probabilites
 
-## we can conclude from the plots, that it is more likely to have had disease Y or to be vaccinated against X, the older a child is.
+print('Compare P(diseaseYZ | vacX = 0/1) with P(diseaseX | vacX = 0/1)')
+prob_y_z_vac_x = ((y[ vacX ==1 ] == 1) | (z[ vacX ==1 ] == 1)).sum() / frame_length
+prob_y_z_not_vac_x = ((y[ vacX ==0 ] == 1) | (z[ vacX ==0 ] == 1)).sum() / frame_length
+print('P(diseaseYZ | vacX = 1)', prob_y_z_vac_x)
+print('P(diseaseYZ | vacX = 0)', prob_y_z_not_vac_x)
+print('Conclusion: it is much more likely to get infected with Y or Z when a child is vaccinated against X. Compared to P(diseaseX | vacX = 0/1), it appears to be not a good idea to vaccinate against X. It brings more YZ infections, while it does not lower X infections very much.')
+print('')
+
+print('Calculate P(diseaseYZ | vacX = 0/1, age = 1/2/3/4)')
+prob_y_z_vac_x_age_1 = ((y[ (vacX ==1) & (age==1) ] == 1) | (z[ (vacX ==1) & (age==1) ] == 1)).sum() / frame_length
+prob_y_z_vac_x_age_2 = ((y[ (vacX ==1) & (age==2) ] == 1) | (z[ (vacX ==1) & (age==2) ] == 1)).sum() / frame_length
+prob_y_z_vac_x_age_3 = ((y[ (vacX ==1) & (age==3) ] == 1) | (z[ (vacX ==1) & (age==3) ] == 1)).sum() / frame_length
+prob_y_z_vac_x_age_4 = ((y[ (vacX ==1) & (age==4) ] == 1) | (z[ (vacX ==1) & (age==4) ] == 1)).sum() / frame_length
+prob_y_z_vac_x_age_5 = ((y[ (vacX ==1) & (age==5) ] == 1) | (z[ (vacX ==1) & (age==5) ] == 1)).sum() / frame_length
+prob_y_z_not_vac_x_age_1 = ((y[ (vacX ==0) & (age==1) ] == 1) | (z[ (vacX ==0) & (age==1) ] == 1)).sum() / frame_length
+prob_y_z_not_vac_x_age_2 = ((y[ (vacX ==0) & (age==2) ] == 1) | (z[ (vacX ==0) & (age==2) ] == 1)).sum() / frame_length
+prob_y_z_not_vac_x_age_3 = ((y[ (vacX ==0) & (age==3) ] == 1) | (z[ (vacX ==0) & (age==3) ] == 1)).sum() / frame_length
+prob_y_z_not_vac_x_age_4 = ((y[ (vacX ==0) & (age==4) ] == 1) | (z[ (vacX ==0) & (age==4) ] == 1)).sum() / frame_length
+prob_y_z_not_vac_x_age_5 = ((y[ (vacX ==0) & (age==5) ] == 1) | (z[ (vacX ==0) & (age==5) ] == 1)).sum() / frame_length
+
+
+print('P(diseaseYZ | vacX = 1, age = 1)', prob_y_z_vac_x_age_1)
+print('P(diseaseYZ | vacX = 1, age = 2)', prob_y_z_vac_x_age_2)
+print('P(diseaseYZ | vacX = 1, age = 3)', prob_y_z_vac_x_age_3)
+print('P(diseaseYZ | vacX = 1, age = 4)', prob_y_z_vac_x_age_4)
+#print('P(diseaseYZ | vacX = 1, age = 5)', prob_y_z_vac_x_age_5)
+print('P(diseaseYZ | vacX = 0, age = 1)', prob_y_z_not_vac_x_age_1)
+print('P(diseaseYZ | vacX = 0, age = 2)', prob_y_z_not_vac_x_age_2)
+print('P(diseaseYZ | vacX = 0, age = 3)', prob_y_z_not_vac_x_age_3)
+print('P(diseaseYZ | vacX = 0, age = 4)', prob_y_z_not_vac_x_age_4)
+#print('P(diseaseYZ | vacX = 0, age = 5)', prob_y_z_not_vac_x_age_5)
+print('As we calculate the probabilities in a deterministic manner, those results are very accurate.')
+print('')
+
+plt.figure('P(diseaseYZ | vacX = 0/1, age = 1/2/3/4)')
+plt.plot([1,2,3,4], [prob_y_z_vac_x_age_1,prob_y_z_vac_x_age_2,prob_y_z_vac_x_age_3,prob_y_z_vac_x_age_4])
+plt.plot([1,2,3,4], [prob_y_z_not_vac_x_age_1,prob_y_z_not_vac_x_age_2,prob_y_z_not_vac_x_age_3,prob_y_z_not_vac_x_age_4])
+plt.savefig('./plots/conditional_prob_diseaseYZ_vacX_age_1234.png')
+
+print('The plot shows a correlation between vaccination against X and the probability to suffer from desease Y or Z. Not being vaccinated seems to be healthier.')
