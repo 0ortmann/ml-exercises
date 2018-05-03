@@ -229,7 +229,7 @@ def average_loss(Y, Y_pred):
 Y_pred = np.dot(X_test, w)
 avg_loss = average_loss(Y_test, Y_pred)
 
-print('The average lossL2 accross the Y_test data is:', avg_loss)
+print('The average lossL2 is:', avg_loss)
 print()
 
 ## d) more dimensions in the data
@@ -255,3 +255,17 @@ Y_cubic_pred = np.dot(X_cubic_test, w_cubic) # predict
 
 avg_cubic_loss = average_loss(Y_test, Y_cubic_pred)
 print('Cubic dimension added. Average loss is:', avg_cubic_loss)
+print()
+
+
+## e) extreme outliers, impact on least_squares
+
+print('Add extreme outliers')
+X_train = np.concatenate((X_train, [[1.05, 1]]))
+Y_train = np.append(Y_train, -10)
+w = least_squares(X_train, Y_train)
+Y_pred = np.dot(X_test, w)
+avg_loss = average_loss(Y_test, Y_pred)
+
+print('The average lossL2 with extreme outliers is:', avg_loss)
+print()
