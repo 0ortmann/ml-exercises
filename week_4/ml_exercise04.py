@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+from scipy import io as sio
 import matplotlib.pyplot as plt
 
 
@@ -176,3 +177,27 @@ plt.plot([1,2,3,4], [prob_y_z_not_vac_x_age_1,prob_y_z_not_vac_x_age_2,prob_y_z_
 plt.savefig('./plots/conditional_prob_diseaseYZ_vacX_age_1234.png')
 
 print('The plot shows a correlation between vaccination against X and the probability to suffer from desease Y or Z. Not being vaccinated seems to be healthier.')
+
+
+
+##### assignment 2
+print('assignment 2')
+
+## a) data loading and preprocessing
+matfile = sio.loadmat('./reg1d.mat')
+print('Keys in the matlab file', matfile.keys())
+
+X_train = matfile['X_train']
+Y_train = matfile['Y_train']
+X_test = matfile['X_test']
+Y_test = matfile['Y_test']
+
+plt.figure('Raw training data')
+plt.scatter(X_train, Y_train)
+plt.savefig('./plots/raw_training_data')
+
+plt.figure('Raw testing data')
+plt.scatter(X_test, Y_test)
+plt.savefig('./plots/raw_testing_data')
+
+X_train = np.insert(X_train, 1, 1, axis=1)
