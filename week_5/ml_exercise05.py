@@ -36,7 +36,7 @@ test_label[(species[indices_test] == 'virginica').flatten()] = 2
 
 
 ## 1 a)
-print('1 a)')
+print('1 a)\n')
 def least_squares(X, Y):
     X_t = X.transpose()
     left = inv(np.dot(X_t, X))
@@ -52,6 +52,7 @@ print('w_setosa: {},\nw_versicolor: {},\nw_virginica: {}\n'.format(w_setosa, w_v
 
 ## 1 b)
 ## predict classes for test data, report 0-1-loss
+print('1 b)\n')
 
 setosa_pred = np.dot(test, w_setosa)
 versicolor_pred = np.dot(test, w_versicolor)
@@ -78,3 +79,10 @@ for entry in zip(pred, test_label):
     losses = np.append(losses, loss_0_1(entry[0], entry[1]))
 
 print('0/1 Losses for all entries:\n{}\n'.format(losses))
+
+print('1 c)\n')
+print('Problems with multiclass linear regression:')
+print('- only the best classificator matches')
+print('- no comparison between the individual classificators')
+print('- trained 1-vs-all: the binary classificators are un-balanced. I.e. they were trained with small positive and larger negatives (eg. setosa ~1/3 of train data, vs not-setosa ~2/3) ')
+print('- confidence could be different for the different classifiers, depending on the size of the train-set\n')
