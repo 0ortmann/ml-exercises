@@ -49,3 +49,32 @@ w_virginica = least_squares(train, train_label_virginica)
 
 print('Estimate regressions 1-vs-all classes.')
 print('w_setosa: {},\nw_versicolor: {},\nw_virginica: {}\n'.format(w_setosa, w_versicolor, w_virginica))
+
+## 1 b)
+## predict classes for test data, report 0-1-loss
+
+setosa_pred = np.dot(test, w_setosa)
+versicolor_pred = np.dot(test, w_versicolor)
+virginica_pred = np.dot(test, w_virginica)
+
+# print(setosa_pred, versicolor_pred, virginica_pred)
+## iterate all predictions, take max predicted value for that class
+
+pred = np.array([])
+for i in range(len(test)):
+    entries = np.array([setosa_pred[i], versicolor_pred[i], virginica_pred[i]])
+    pred_class = np.argmax(entries) ## gives index, that is our class! (0 = setosa, 1 = versicolor, 2 = virginica)
+    pred = np.append(pred, pred_class)
+
+print('Predicted classes for the test data:\n{}\n'.format(pred))
+
+def loss_0_1(Y, Y_pred):
+    return int(Y != Y_pred)
+
+print('Verify predicted classes against test_label:\n{}\n'.format(test_label))
+
+losses = np.array([])
+for entry in zip(pred, test_label):
+    losses = np.append(losses, loss_0_1(entry[0], entry[1]))
+
+print('0/1 Losses for all entries:\n{}\n'.format(losses))
