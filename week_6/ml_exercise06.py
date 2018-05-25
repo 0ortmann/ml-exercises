@@ -68,3 +68,50 @@ The loss is reduced by increasing C, but after a certain threshold (around 0.1) 
 is marginal. We can see clearly from the plot that the losses for a C of 1 and a C of 50 are almost identical.
 We expected the algortihm to overfit the training data, but the test loss shows no indication of this. 
 '''
+
+
+## assignment 6.3
+print("assignment 6.3 complexities")
+
+print('''a) complexity of predictions:
+    a.1) linear least squares (d dimensions, n training points):
+        Training is mainly influenced by matrix inversion, which is in O(d^3) and matrix multiplication, which is in O(d^2 * N). So the complexity depends which variable is bigger in size, N or d. So the complexity is O(max(N, d) * d^2)
+        Testing is only a dot product with the weight vector.
+    a.2) d-kNN:
+        Training is in O(1) (data is already given)
+        Testing: In case the distances are not precomputed for k, each iteration has to calculate them for each checked point. That would result in O(n*d*k).
+    ''')
+
+print('''b) complexity of predicting with a already fitted SVM:
+    It strongly depends on the SVM kernel. We consider linear kernels and non-linear kernels:
+    - Linear kernel:
+        Once the training is done, the fitted hyperplane is the only source of truth that is needed. The prediction can be performed as a simple dot product between the test vector and the learned weight vector.
+        For linear kernels, the prediction time is independent of the number of support vectors. Of course this also depends on how the SVM works internally.
+    - non-linear kernels:
+        The separating hyperplane can have multiple (even infinite) dimensions, eg with RBF kernel. During training time the support vectors are selected. At test time, the complexity is then linear to the number of support vectors m and linear on the number dimensions -> O(m * d)
+    ''')
+
+print('''c) space complexity:
+    - Linear least squares: once the weight vector is computed, its size terminates the needed space.
+    - kNN: space is in O(n * d), given n training points and d dimensions
+    - SVM: space is in O(n * d') (assuming that the kernel transformed d dimensions into d' dimensions in kernel space.)
+    ''')
+
+print('''d) 
+    - Calculate linear least squares vector: X is matrix(n, d) = X(10000, 256).
+        X' dot X -> n*d^2 ops, produces d,d matrix
+        inversion of d,d matrix -> d^3 ops
+        X' dot Y -> n*d^2 ops, produces d,d matrix 
+        multiplication of 2 d,d matrics -> d^3 ops
+        => 1344274432 ops (2*(n*d**2)+2*d**3)
+        => final space is just a d-vector
+    - kNN: for each 10000 datapoints, check 256 dimensions and get k nearest points to a test point:
+        => 25600000 ops
+        => n * d space
+    - 1000 support vectors:
+        => after training: O(m*d) ~ 256000 ops
+        => space 1000*256 ~ 2560000''')
+
+
+# You are right, the prediction time does not depend on the data for a linear SVM. This is because the predictor is ust a dot product between a test vector and the learned weight vector.
+
