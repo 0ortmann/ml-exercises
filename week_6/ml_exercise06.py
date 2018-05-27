@@ -81,12 +81,10 @@ def plot_score(score, name, title):
 test_losses, train_losses, score = svc_predict(cancer_input_train, cancer_input_test, cancer_target_train, cancer_target_test, 'rbf')
 plot_losses(test_losses, train_losses, 'C_losses', 'losses for different values of C (0.01-50, log scaled)')
 plot_score(score, 'C_scores', 'Accuracy for different values of C')
-'''
-What is the effect of choosing a large cost?
-The loss is reduced by increasing C, but after a certain threshold (around 0.1) the improvement of the losses 
-is marginal. We can see clearly from the plot that the losses for a C of 1 and a C of 50 are almost identical.
-We expected the algortihm to overfit the training data, but the test loss shows no indication of this. 
-'''
+
+print('''assignment 6.2 a) What is the effect of choosing a large cost?
+    The loss is reduced by increasing C, but after a certain threshold (around 0.1) the improvement of the losses is marginal. We can see clearly from the plot that the losses for a C of 1 and a C of 50 are almost identical. We expected the algortihm to overfit the training data, but the test loss shows no indication of this. 
+''')
 #6.2 b) different kernels
 
 
@@ -114,8 +112,7 @@ eval_params('rbf')
 #eval_params('sigmoid')   
 
 
-print('''
-Evaluation results: 
+print('''assignment 6.2 b) Finding a well performing kernel:
 The kernel that performs best on the data is the rbf kernel, closely followed by the sigmoid and poly (d=1) kernels.
 When picking the gamma parameter, it is evident the results get better the closer we get to the default value 1/n_features
 For the poly kernel, the kernel of degree 1 gives the best results with regards to loss and accuracy
