@@ -13,21 +13,23 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import cross_val_score
 
 
-'''
-6.1: 
-configuring the SVM: 
-to configure our SVM, we set the respective parameters when calling the class (see code for example)
-training the SVM:
-to train the SVM, we fit it to our training data and labels (see code for example)
-classifying a new test point: 
-to classify a new test point, we use the predict function (see code for example)
-accessing the support vectors: the different svm class implementations provide certain member functions to
-access the support vectors: to access the vectors, use support_vectors_, to access the indices, use support_, to 
-get the number of vectors, use n_support
-multi-class classification: to configure our SVM to do a multiclass classification, we have to define the shape 
-of the decision function in order to incorporate the results of the one against all classification into one 
-classification output
-'''
+print("assignment 6.1, sklearn SVM documentation")
+
+print('''
+    - configuring the SVM:
+        to configure our SVM, we set the respective parameters when calling the class (see code for example)
+    - training the SVM:
+        to train the SVM, we fit it to our training data and labels (see code for example)
+    - classifying a new test point:
+        to classify a new test point, we use the predict function (see code for example)
+    - accessing the support vectors:
+        the different svm class implementations provide certain member functions to access the support vectors:
+            - 'support_vectors_': access the vectors directly
+            - 'support_': access the indices
+            - 'n_support': get the number of vectors
+    - multi-class classification:
+        to configure our SVM to do a multiclass classification, we have to define the shape of the decision function in order to incorporate the results of the one against all classification into one classification output.
+''')
 
 #6.2
 matfile = sio.loadmat('./cancer-data.mat')
@@ -47,12 +49,12 @@ def svc_predict(cancer_input_train, cancer_input_test, cancer_target_train, canc
     scores = []
     for c in C:
         clf = svm.SVC(c, kernel, degree, gamma, coef0) #calling SVC class, configuring the SVM
-        clf.fit(cancer_input_train, cancer_target_train) #training the SVM
+        clf.fit(cancer_input_train, cancer_target_train.ravel()) #training the SVM
         y_pred_test = clf.predict(cancer_input_test) #classify the test data
         y_pred_train = clf.predict(cancer_input_train) #classify the training data
         test_losses.append(metrics.zero_one_loss(cancer_target_test, y_pred_test)) #compute 0-1 test loss 
         train_losses.append(metrics.zero_one_loss(cancer_target_train, y_pred_train)) #compute 0-1 train loss 
-        score = cross_val_score(clf, cancer_input_train, cancer_target_train, cv=5)
+        score = cross_val_score(clf, cancer_input_train, cancer_target_train.ravel(), cv=5)
         scores.append(score.mean())
     return test_losses, train_losses, scores
     
@@ -112,13 +114,12 @@ eval_params('rbf')
 #eval_params('sigmoid')   
 
 
-'''
+print('''
 Evaluation results: 
-the kernel that performs best on the data is the rbf kernel, closely followed by the sigmoid and poly (d=1) kernels. 
+The kernel that performs best on the data is the rbf kernel, closely followed by the sigmoid and poly (d=1) kernels.
 When picking the gamma parameter, it is evident the results get better the closer we get to the default value 1/n_features
 For the poly kernel, the kernel of degree 1 gives the best results with regards to loss and accuracy
-'''
-
+''')
 
 #6.2 c) swap train and test sets
 test_losses, train_losses, score = svc_predict(cancer_input_test, cancer_input_train, cancer_target_test, cancer_target_train, 'rbf')
@@ -158,7 +159,7 @@ print('''c) space complexity:
     - SVM: space is in O(n * d') (assuming that the kernel transformed d dimensions into d' dimensions in kernel space.)
     ''')
 
-print('''d) 
+print('''d) specific data sample
     - Calculate linear least squares vector: X is matrix(n, d) = X(10000, 256).
         X' dot X -> n*d^2 ops, produces d,d matrix
         inversion of d,d matrix -> d^3 ops
