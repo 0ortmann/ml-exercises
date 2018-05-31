@@ -99,7 +99,7 @@ predict_kernels(cancer_input_train, cancer_input_test, cancer_target_train, canc
 
 #evaluating different parameters
 degrees = np.arange(6)
-gammas = np.arange(0.01, 0.1, 0.01)
+gammas = [0.1, 2, 10, 50]
 coef0s = np.arange(0.0, 2.0, 0.2)
 
 def eval_params(kernel):
@@ -151,7 +151,7 @@ print('''b) complexity of predicting with a already fitted SVM:
     ''')
 
 print('''c) space complexity:
-    - Linear least squares: once the weight vector is computed, its size terminates the needed space.
+    - Linear least squares: once the weight vector is computed, its size terminates the needed space. O(d)
     - kNN: space is in O(n * d), given n training points and d dimensions
     - SVM: space is in O(n * d') (assuming that the kernel transformed d dimensions into d' dimensions in kernel space.)
     ''')
@@ -162,7 +162,7 @@ print('''d) specific data sample
         inversion of d,d matrix -> d^3 ops
         X' dot Y -> n*d^2 ops, produces d,d matrix 
         multiplication of 2 d,d matrics -> d^3 ops
-        => 1344274432 ops (2*(n*d**2)+2*d**3)
+        => 1.344.274.432 ops (2*(n*d**2)+2*d**3)
         => final space is just a d-vector
     - kNN: for each 10000 datapoints, check 256 dimensions and get k nearest points to a test point:
         => 25600000 ops
