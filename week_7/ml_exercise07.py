@@ -8,7 +8,9 @@ print('''assignment 7.02
 
 print('''assignment 7.03
     a) Downloaded script from https://scikit-learn.org/0.15/_downloads/face_recognition.py
-       We had to change line 108, class_weight parameter in call to SVC. We set the parameter to "balanced", before it was "auto", but that is no longer an option with current versions of sklearn.
+       We had to change some lines in order get everything running with sklearn 0.19.1:
+       - line 90: 'RandomizedPCA' is deprecated. We used the 'PCA' class with parameter svd_solver='randomized'.
+       - line 108: class_weight parameter in call to SVC. We set the parameter to "balanced", before it was "auto", but that is no longer an option with current versions of sklearn.
     b) The script calls the built-in function "fetch_lfw_people" from sklearn. It downloads a built-in dataset, called "labeled faces in the wild". Properties (taken from the documentation: https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_lfw_people.html)
         - pictures centered on single face
         - pixel in rgb
