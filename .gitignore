@@ -4,3 +4,5 @@
 *.csv
 *.xc
 *.xcf
+*.tar.gz
+week_7/face_recognition.py
