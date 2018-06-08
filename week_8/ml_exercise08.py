@@ -21,3 +21,17 @@ print('''1 b) operation performance
     - CSR: fast row slicing, slow col slicing. Efficient for traversal -> dot product / multiplicaiton
     - CSC: fast col slicing, slow row slicing. Efficient for traversal -> dot product / multiplicaiton
     ''')
+
+
+import numpy as np
+from scipy.sparse import csr_matrix
+
+print('''1 c) calculate sparsity
+    The scipy baseclass for sparse matrices offers two functions 'get_shape()' and 'getnnz()', which can be used to calculate the sparsity of a matrix:
+    ''')
+orig_arr = np.array([[1, 2, 0], [0, 0, 3], [4, 0, 5]])
+A = csr_matrix(orig_arr)
+shape, nnz = A.get_shape(), A.getnnz()
+print('Original matrix data:\n{}\nCSR Matrix:\n{}\nshape: {}\nnon-zero-values: {}'.format(orig_arr, A, shape, nnz))
+print('Sparsity = {}'.format(nnz / (shape[0] * shape[1])))
+
