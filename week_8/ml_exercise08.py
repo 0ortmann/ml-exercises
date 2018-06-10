@@ -134,3 +134,9 @@ print('Found words:', word_counts.shape[1])
 predicted = do_2c(word_counts)
 for doc, category in zip(classify_text, predicted):
     print('{} => {}'.format(doc, twenty_newsgroups.target_names[category]))
+
+print('''2 e) TF-IDF
+    Word counts only describe which words are used often. In longer texts, there are more words used in general than in short texts.
+    With word frequencies it is more easy to get a grasp of the importance of a word for a the text it appears in. Considering the word frequency strips away the importance of the length of the document.
+    This can even be improved by using TF-IDF (term frequency x inverse document frequency). IDF looks at a whole text corpus. Words that are frequent among a majority of texts are treated as being less informative, thus get a lower score. IDF is much less disturbing then stopwords. 
+    ''')
