@@ -55,7 +55,7 @@ print('''1 e) solve linear equations:
 import time
 
 print('Sparse matrix solving:')
-for n in [10, 100, 1000, 10000, 100000, 1000000, 10000000]:
+for n in [10, 100, 1000, 10000]: #, 100000, 1000000, 10000000]:
     start = time.time()
     A = rand_diag(n)
     b = np.ones(n)
@@ -64,7 +64,7 @@ for n in [10, 100, 1000, 10000, 100000, 1000000, 10000000]:
 print('With n=10000000 I used more than 7G ram, this was the maximum I could solve on my machine. But it took only ~9.2 seconds.\n')
 
 print('Dense matrix solving:')
-for n in [10, 100, 1000, 10000]:
+for n in [10, 100, 1000]: #, 10000]:
     start = time.time()
     A = rand_diag(n)
     b = np.ones(n)
@@ -72,3 +72,17 @@ for n in [10, 100, 1000, 10000]:
     print('n={} --> {} seconds'.format(n, time.time()-start))
 
 print('''It took more than 236 seconds (~4 minutes) to solve the dense matrix for n=10000 on my machine. For n=100000 I got a memory error when calling the '.todense()' function. The optimizations that can safely be made for sparse matrices have a huge impact on runtime.''')
+
+
+print('\n\nassignment 2: "20 Newsgroups" data set')
+
+from sklearn.datasets import fetch_20newsgroups
+categories = ['alt.atheism', 'soc.religion.christian', 'comp.graphics', 'sci.med']
+twenty_newsgroups = fetch_20newsgroups(categories=categories, shuffle=True, random_state=41)
+
+print(twenty_newsgroups.keys())
+print('''2 a) general data properties:
+    files: {}
+    labels: {}
+    classes: {}
+    '''.format(len(twenty_newsgroups.filenames), twenty_newsgroups.target_names, np.unique(twenty_newsgroups.target)))
