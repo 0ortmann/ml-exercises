@@ -77,6 +77,8 @@ print('''It took more than 236 seconds (~4 minutes) to solve the dense matrix fo
 print('\n\nassignment 2: "20 Newsgroups" data set')
 
 from sklearn.datasets import fetch_20newsgroups
+from sklearn.feature_extraction.text import CountVectorizer
+
 categories = ['alt.atheism', 'soc.religion.christian', 'comp.graphics', 'sci.med']
 twenty_newsgroups = fetch_20newsgroups(categories=categories, shuffle=True, random_state=41)
 
@@ -86,3 +88,14 @@ print('''2 a) general data properties:
     labels: {}
     classes: {}
     '''.format(len(twenty_newsgroups.filenames), twenty_newsgroups.target_names, np.unique(twenty_newsgroups.target)))
+
+## 2 b)
+
+count_vect = CountVectorizer()
+word_counts = count_vect.fit_transform(twenty_newsgroups.data)
+
+print('''2 b) tokenize data:
+    - Found words: {}
+    - Access word list: use count_vect.get_feature_names() for a full list of all words
+    - Find index for given word: use count_vect.vocabulary_.get(...)'''.format(word_counts.shape[1]))
+
