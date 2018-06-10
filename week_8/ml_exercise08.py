@@ -74,7 +74,7 @@ for n in [10, 100, 1000]: #, 10000]:
 print('''It took more than 236 seconds (~4 minutes) to solve the dense matrix for n=10000 on my machine. For n=100000 I got a memory error when calling the '.todense()' function. The optimizations that can safely be made for sparse matrices have a huge impact on runtime.''')
 
 
-print('\n\nassignment 2: "20 Newsgroups" data set')
+print('\n\nassignment 2: "20 Newsgroups" data set\n')
 
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import CountVectorizer
@@ -84,7 +84,6 @@ from sklearn.naive_bayes import MultinomialNB
 categories = ['alt.atheism', 'soc.religion.christian', 'comp.graphics', 'sci.med']
 twenty_newsgroups = fetch_20newsgroups(categories=categories, shuffle=True, random_state=41)
 
-print(twenty_newsgroups.keys())
 print('''2 a) general data properties:
     files: {}
     labels: {}
@@ -124,7 +123,7 @@ predicted = do_2c(word_counts)
 for doc, category in zip(classify_text, predicted):
     print('{} => {}'.format(doc, twenty_newsgroups.target_names[category]))
 
-print('''2 d) Stopwords
+print('''\n2 d) Stopwords
     Stopwords are used to filter out common words with few meaning / impact on single search terms. Common stopwords are 'is, are, a, the, for, to, from....'.
     Redo 2 c) with enabled english stopwords:''')
 
@@ -135,7 +134,7 @@ predicted = do_2c(word_counts)
 for doc, category in zip(classify_text, predicted):
     print('{} => {}'.format(doc, twenty_newsgroups.target_names[category]))
 
-print('''2 e) TF-IDF
+print('''\n2 e) TF-IDF
     Word counts only describe which words are used often. In longer texts, there are more words used in general than in short texts.
     With word frequencies it is more easy to get a grasp of the importance of a word for a the text it appears in. Considering the word frequency strips away the importance of the length of the document.
     This can even be improved by using TF-IDF (term frequency x inverse document frequency). IDF looks at a whole text corpus. Words that are frequent among a majority of texts are treated as being less informative, thus get a lower score. IDF is much less disturbing then stopwords. 
