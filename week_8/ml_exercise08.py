@@ -139,3 +139,13 @@ print('''\n2 e) TF-IDF
     With word frequencies it is more easy to get a grasp of the importance of a word for a the text it appears in. Considering the word frequency strips away the importance of the length of the document.
     This can even be improved by using TF-IDF (term frequency x inverse document frequency). IDF looks at a whole text corpus. Words that are frequent among a majority of texts are treated as being less informative, thus get a lower score. IDF is much less disturbing then stopwords. 
     ''')
+
+print('''assignment 3: invoking script from 'http://scikit-learn.org/stable/auto_examples/text/document_classification_20newsgroups.html' with different parameters:
+
+    - normal execution with --report --confusion_matrix:
+      average detection precision is for all tested classifiers somewhere in the late 80s or even 90%. There seems to be a general confusion for approx. 40 documents of the 4th class, that are commonly misclassified as the 1st class.
+    - use --filtered:
+      After filtering headers, quotes and emails, the classification got worse. For most classifiers the precision is around 75%, which is clearly below the unfiltered processing. i.e. then kNN precision suffered, that classifier is completely broken with this parameter. It has only 26% precision.
+    - use --all_categories:
+      With the bigger corpus, prediction became a little less accurate. On average the classifiers were between 75% and 85% accurate. There is no clear winner / best classifier.
+      The best four with each 86% are: Ridge, PassiveAggressive, SGDClassifier and LinearSVC. It appears for this kind of classification, kNN is performing least among all three test runs.''')
