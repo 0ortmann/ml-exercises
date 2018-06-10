@@ -78,6 +78,8 @@ print('\n\nassignment 2: "20 Newsgroups" data set')
 
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.naive_bayes import MultinomialNB
 
 categories = ['alt.atheism', 'soc.religion.christian', 'comp.graphics', 'sci.med']
 twenty_newsgroups = fetch_20newsgroups(categories=categories, shuffle=True, random_state=41)
@@ -98,4 +100,27 @@ print('''2 b) tokenize data:
     - Found words: {}
     - Access word list: use count_vect.get_feature_names() for a full list of all words
     - Find index for given word: use count_vect.vocabulary_.get(...)'''.format(word_counts.shape[1]))
+
+
+## 2 c)
+
+classify_text = ['didactics are important for university courses', 'new smartphone released', 'apples or bananas?', 'apple mac book', 'chicken tikka plate']
+
+def do_2c(word_counts):
+    tfidf_transformer = TfidfTransformer()
+    tfidf = tfidf_transformer.fit_transform(word_counts)
+
+    nb_classifier = MultinomialNB().fit(tfidf, twenty_newsgroups.target)
+
+    clsfy_counts = count_vect.transform(classify_text)
+    clsfy_tfidf = tfidf_transformer.transform(clsfy_counts)
+
+    predicted = nb_classifier.predict(clsfy_tfidf)
+    return predicted
+
+print('2 c) classify own text to the imported word-bags:')
+
+predicted = do_2c(word_counts)
+for doc, category in zip(classify_text, predicted):
+    print('{} => {}'.format(doc, twenty_newsgroups.target_names[category]))
 
