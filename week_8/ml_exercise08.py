@@ -24,7 +24,7 @@ print('''1 b) operation performance
 
 
 import numpy as np
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, diags
 
 print('''1 c) calculate sparsity
     The scipy baseclass for sparse matrices offers two functions 'get_shape()' and 'getnnz()', which can be used to calculate the sparsity of a matrix:
@@ -33,5 +33,12 @@ orig_arr = np.array([[1, 2, 0], [0, 0, 3], [4, 0, 5]])
 A = csr_matrix(orig_arr)
 shape, nnz = A.get_shape(), A.getnnz()
 print('Original matrix data:\n{}\nCSR Matrix:\n{}\nshape: {}\nnon-zero-values: {}'.format(orig_arr, A, shape, nnz))
-print('Sparsity = {}'.format(nnz / (shape[0] * shape[1])))
+print('Sparsity = {}\n'.format(nnz / (shape[0] * shape[1])))
 
+print('''1 d) random sparse tri-diagonal matrix
+    Example matrix with n=10:''')
+
+n = 10
+diagonals = np.random.randint(1, n, size=(3, n))
+A = diags(diagonals, [-1, 0, 1], shape=(n, n))
+print(A.toarray())
