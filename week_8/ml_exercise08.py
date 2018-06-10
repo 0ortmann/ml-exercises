@@ -124,3 +124,13 @@ predicted = do_2c(word_counts)
 for doc, category in zip(classify_text, predicted):
     print('{} => {}'.format(doc, twenty_newsgroups.target_names[category]))
 
+print('''2 d) Stopwords
+    Stopwords are used to filter out common words with few meaning / impact on single search terms. Common stopwords are 'is, are, a, the, for, to, from....'.
+    Redo 2 c) with enabled english stopwords:''')
+
+count_vect = CountVectorizer(stop_words='english')
+word_counts = count_vect.fit_transform(twenty_newsgroups.data)
+print('Found words:', word_counts.shape[1])
+predicted = do_2c(word_counts)
+for doc, category in zip(classify_text, predicted):
+    print('{} => {}'.format(doc, twenty_newsgroups.target_names[category]))
