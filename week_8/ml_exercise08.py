@@ -149,3 +149,9 @@ print('''assignment 3: invoking script from 'http://scikit-learn.org/stable/auto
     - use --all_categories:
       With the bigger corpus, prediction became a little less accurate. On average the classifiers were between 75% and 85% accurate. There is no clear winner / best classifier.
       The best four with each 86% are: Ridge, PassiveAggressive, SGDClassifier and LinearSVC. It appears for this kind of classification, kNN is performing least among all three test runs.''')
+
+print('''Notes from presentation in class:
+    The removal of email addresses leads to miss-classification, because the author is a very clear indicator for which category a text belongs to.
+    All-categories: much confusion between atheism and christianity.
+    Other people have tested training times and shit.
+    In general: i did a poor job on explaining the 'whys' of the runs.''')
