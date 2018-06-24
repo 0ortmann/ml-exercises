@@ -53,7 +53,7 @@ for i, x in enumerate(list(corr.columns)):
 
 X = corr.values
 dist = cls_h.distance.pdist(X)
-link = cls_h.linkage(dist, method='centroid')
+link = cls_h.linkage(dist, method='complete')
 ind = cls_h.fcluster(link, interest_threshold*dist.max(), 'distance')
 cols = [train.columns.tolist()[i] for i in list((np.argsort(ind)))]
 rearranged = train.reindex(cols, axis=1)
