@@ -1,14 +1,7 @@
 \section{Feature Analysis}
 
-The features are very different in their values as well as in their meaning. We decided to do a normalization accross all those features, that indicate quality (eg. if the house has a garage or fireplace \texttt{FireplaceQu}). Many quality related features are rated on this scale:
+We constructed a pairwise correlation matrix accross all features. The corresponding plot can be found in \texttt{plots/feature_correlation.png}. We set a configurable threshold to determine interesting correlation of features. When the script is executed, a full list is printed.
 
-\begin{itemize}
-    \item Ex:~~~ Excellent -- Exceptional Masonry Fireplace
-    \item Gd:~~~ Good -- Masonry Fireplace in main level
-    \item TA:~~~ Average -- Prefabricated Fireplace in main living area or Masonry Fireplace in basement
-    \item Fa:~~~ Fair -- Prefabricated Fireplace in basement
-    \item Po:~~~ Poor -- Ben Franklin Stove
-    \item NA:~~~ No Fireplace
-\end{itemize}
+Many features that rate quality are correlated. This indicates, that houses are generally either of higher or lower quality accross many measured aspects, but not wildly mixed with high and low quality attributes.
 
-There are other quality related features, but they have already have a numerical scale from $1 to 10$, which we did not change. We scaled the quality-related features with string values to numerical values, using the numbers from $0 to 10$. We used a step of $2$ with $10$ meaning \texttt{Excellent} and $0$ meaning \texttt{Not Available}. This gives us a comparable quality measurement accross many attributes.
+Some features are directly correlated with the \texttt{SalePrice}. They appear to be typical factors for housing prizes, such as the quality of the kitchen and basement as well as the size of the garage or the first floor.
