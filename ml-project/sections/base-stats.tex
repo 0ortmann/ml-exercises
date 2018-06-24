@@ -1,3 +1,14 @@
 \section{Basic Statistics}
 
-Related work.
+The features are very different in their values as well as in their meaning. We decided to do a normalization accross all those features, that indicate quality (eg. if the house has a garage or fireplace \texttt{FireplaceQu}). Many quality related features are rated on this scale:
+
+\begin{itemize}
+    \item Ex:~~~ Excellent -- Exceptional Masonry Fireplace
+    \item Gd:~~~ Good -- Masonry Fireplace in main level
+    \item TA:~~~ Average -- Prefabricated Fireplace in main living area or Masonry Fireplace in basement
+    \item Fa:~~~ Fair -- Prefabricated Fireplace in basement
+    \item Po:~~~ Poor -- Ben Franklin Stove
+    \item NA:~~~ No Fireplace
+\end{itemize}
+
+There are other quality related features, but they have already have a numerical scale from $1 to 10$, which we did not change. We scaled the quality-related features with string values to numerical values, using the numbers from $0 to 10$. We used a step of $2$ with $10$ meaning \texttt{Excellent} and $0$ meaning \texttt{Not Available}. This gives us a comparable quality measurement accross many attributes.
