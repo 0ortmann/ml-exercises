@@ -1,1 +1,5 @@
-\section{Clustering} 
+\section{Clustering}
+
+We decided to use \texttt{k-means} for clustering and therefore reduced the dimensionality of the data from 79 to 4 dimensions. The tested dimensions all regard quality measurements of the houses and were chosen because of their high correlation values: \texttt{OverallQual}, \texttt{ExterQual}, \texttt{HeatingQC} and \texttt{KitchenQual}.
+
+\texttt{k-means} was fitted for 2, 3 and 4 clusters. For each cluster found by the algorithm, we re-inferred information about the \texttt{SalePrice} feature. We analyze $mean$, $min$ and $max$ \texttt{SalePrice}s of all houses in each cluster. Plots can be found in the plots folder.
