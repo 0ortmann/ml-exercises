@@ -14,3 +14,4 @@ week_8/document_classification_20newsgroups.py
 *.fls
 *.log
 *.out
+ml-project/data/**
