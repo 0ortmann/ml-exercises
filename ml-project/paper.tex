@@ -15,6 +15,9 @@
 \usepackage{titlesec}
 \usepackage{scrpage2}
 
+\renewcommand\thesection{\alph{section})}
+
+
 \makeatletter
 \def\email#1{{\tt#1}}
 \def\subtitle#1{\gdef\@subtitle{#1}}
@@ -68,14 +71,15 @@
 \maketitle
 
 \begin{abstract}
-	Some abstract for this paper.
+	Machine Learning lecture, mini project task. The following paper reflects assignment 10 of the weekly ML exercises. The task is to analyze basic statistical attributes of a \url{kaggle.com} competition data-set of our choosing. We chose this competition: \url{https://www.kaggle.com/c/house-prices-advanced-regression-techniques}
 \end{abstract}
 
 \input{sections/intro}
-\input{sections/related}
-\input{sections/work}
-\input{sections/impl}
-\input{sections/results}
+\input{sections/base-stats}
+\input{sections/features}
+\input{sections/clustering}
+\input{sections/reduction}
+\input{sections/other-aspects}
 \input{sections/conclusion}
 
 \nocite{*}
