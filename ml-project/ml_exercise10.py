@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import math
 import scipy
 import scipy.cluster.hierarchy as cls_h
-
+from sklearn.cluster import KMeans
+from collections import defaultdict
 train = pd.read_csv("./data/train.csv", sep=',')
 
 ## b) base stats
@@ -59,3 +60,27 @@ cols = [train.columns.tolist()[i] for i in list((np.argsort(ind)))]
 rearranged = train.reindex(cols, axis=1)
 
 plot_corr(rearranged.corr(), 'plots/clustered_features.png')
+
+## d) clustering (we decided to use k-means)
+
+K = [2, 3, 4]
+# only cluster for selected quality related columns
+qa = train[['OverallQual', 'ExterQual', 'HeatingQC', 'KitchenQual']]
+
+for k in K:
+    kmeans = KMeans(n_clusters=k, random_state=42).fit(qa)
+    ## now for each cluster determine the some attributes of the SalePrice feature distribution
+    cluster = defaultdict(list)
+    for i, l in enumerate(kmeans.labels_):
+        iPrice = train['SalePrice'][i]
+        cluster[l] += [iPrice]
+    print('Divided dataset into {} clusters based on quality attributes. Cluster centroids: {}. Basic statistics of "SalePrice" value:'.format(k, kmeans.cluster_centers_))
+    plt.figure()
+    for c, houses in cluster.items():
+        mean, mi, ma = sum(houses)/float(len(houses),), min(houses), max(houses)
+        print('cluster {}: mean {}, min {}, max {}'.format(c, mean, mi, ma))
+        plt.plot((c, c), (mi, ma), 'k-')
+        plt.plot(c, mean, 'ro')
+        plt.xlabel('Clusters built by quality ratings')
+        plt.ylabel('min/max/mean "SalePrice" per cluster')
+    plt.savefig('plots/k-means-quality-saleprice_k={}'.format(k))
