@@ -7,3 +7,10 @@
 *.tar.gz
 week_7/face_recognition.py
 week_8/document_classification_20newsgroups.py
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
