@@ -84,3 +84,17 @@ for k in K:
         plt.xlabel('Clusters built by quality ratings')
         plt.ylabel('min/max/mean "SalePrice" per cluster')
     plt.savefig('plots/k-means-quality-saleprice_k={}'.format(k))
+
+#basic data analysis & plots for subgroup of features
+
+train_small = train[['SalePrice', 'LotArea', 'OverallQual', 'OverallCond', 'GrLivArea']]
+#print(train)
+
+train_small.boxplot()
+plt.savefig('plots/boxplot.png')
+
+train_small.hist()
+plt.tight_layout()
+plt.savefig('plots/hist_selected_features.png')
+
+print(train_small.describe())
