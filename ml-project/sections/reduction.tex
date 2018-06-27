@@ -1,1 +1,5 @@
 \section{Dimensionality Reduction}
+
+We decided to use principal component analysis (PCA) to reduce dimensionality. So far, we are only considering numerical values of the train data and excluded all categorical values. This leaves us with 47 dimensions. We reduced them via PCA to 4, 8, 16 and 32 dimensions.
+
+Additionally we implemented a very simple prediction via linear regression. Apparently linear regression does not work well with our reduced dimensions, as we were only able to obtain roughly 75\% prediction precision. Nonetheless. How well PCA works will be evaluated with the next project task, where we will try different models for prediction on a dimensionally reduced training set.
