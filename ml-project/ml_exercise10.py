@@ -72,7 +72,7 @@ corr_small = train_small.corr()
 plot_corr(corr, 'plots/feature_correlation.png')
 plot_corr(corr_small, 'plots/selected_features_correlation')
 
-
+interest_threshold = 0.6		
 for i, x in enumerate(list(corr.columns)):
     for j in list(corr.columns)[i:]:
         if (corr.ix[x,j] > interest_threshold or corr.ix[x,j] < -1 * interest_threshold) and corr.ix[x,j] != 1:
