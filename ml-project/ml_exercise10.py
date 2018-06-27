@@ -111,9 +111,9 @@ def kmeans(df, name):
             plt.savefig('plots/' + name + 'k-means-saleprice_k={}'.format(k))
 
 print('KMeans on all quality attributes:')
-#kmeans(qa, 'quality')
+kmeans(qa, 'quality')
 print('KMeans on few meaningful features:')
-#kmeans(train_small, 'selectedfeatures')
+kmeans(train_small, 'selectedfeatures')
 print()
 
 ## e) dimensionality reduction (we decided to use PCA)
