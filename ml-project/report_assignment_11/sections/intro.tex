@@ -1,1 +1,7 @@
 \section{Introduction}
+
+The dataset contains very verbose housing data, to be found here: \url{https://www.kaggle.com/c/house-prices-advanced-regression-techniques}. Each house (row) in the training data is described by 81 features. One of them is the ID, another one is the \texttt{SalePrice}. The task of the kaggle competition is to predict the \texttt{SalePrice}.
+
+The test data provided in the competition has 80 features, the \texttt{SalePrice} is not provided. A submission should only include house IDs and the predicted sale prices.
+
+In order to reason about our prediction precision, we will split the training data that was provided with the competition into two disjunct training and test sets. This split enables us to evaluate our prediction performance. Finally we will apply our trained models to the real kaggle test data set and compare results with other pariticipants.
