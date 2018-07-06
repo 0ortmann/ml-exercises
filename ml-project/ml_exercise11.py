@@ -33,7 +33,7 @@ def plot_sale_price_dist_and_prob(label_dist, label_prob):
 plot_sale_price_dist_and_prob('./plots/saleprice_distribution_orig.png', './plots/saleprice_probability.png')
 
 # check the plots -> saleprice is right-skewed. apply log1p to pull-in values
-train["SalePrice"] = np.log1p(train["SalePrice"])
+train['SalePrice'] = np.log1p(train['SalePrice'])
 plot_sale_price_dist_and_prob('./plots/saleprice_distribution_log_scaled.png', './plots/saleprice_probability_log_scaled.png')
 
 # normalize quality related data fields to have a numerical scale:
@@ -55,11 +55,18 @@ test = test.select_dtypes(['number', np.number])
 
 # store ID columns, then drop them
 train_ID = train['Id']
-train.drop("Id", axis = 1, inplace = True)
+train.drop('Id', axis = 1, inplace = True)
 test_ID = test['Id']
-test.drop("Id", axis = 1, inplace = True)
+test.drop('Id', axis = 1, inplace = True)
 
 y_train = train.SalePrice.values
 train.drop(['SalePrice'], axis=1, inplace=True)
+print('\nSalePrice after log-scaling.\n  min: {}\n  max: {}\n'.format(np.min(y_train), np.max(y_train)))
 
-### predict
+### evaluate models
+
+def cross_val(model):
+    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    return cross_val_score(model, train.values, y_train, scoring='neg_mean_squared_error', cv = kf)
+
+
