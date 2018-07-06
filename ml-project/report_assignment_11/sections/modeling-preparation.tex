@@ -1,1 +1,53 @@
 \section{Predictive Modeling Preparation Steps}
+
+We performed rudimentary preprocessing steps on the original data. First we log-scaled the target variable \texttt{SalePrice}. Second we transformed ordinal categorical values to numerical values where possible. Third, we omitted all remaining categorical data points. Additionally, we replaced $NaN$ values with $0$.
+
+\subsection{Log-Scaling the Target Variable}
+The \texttt{SalePrice} variable is our target for prediction. We analyzed the distribution of that variable, compared to the normal distribution. Furthermore, we used the \texttt{probplot} helper method from \texttt{scipy.stats} to get a probability plot for the \texttt{SalePrice}. Figure \ref{fig:saleprice_orig} shows that our target variable is right-skewed.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.4\textwidth}
+        \includegraphics[width=\linewidth]{../plots/saleprice_distribution_orig.png}
+        \caption{Distribution}
+    \end{subfigure}
+    \begin{subfigure}{.4\textwidth}
+        \includegraphics[width=\linewidth]{../plots/saleprice_probability.png}
+        \caption{Probability plot}
+    \end{subfigure}
+    \caption{Original \texttt{SalePrice} distributions}
+    \label{fig:saleprice_orig}
+\end{figure}
+
+As we want to use linear models for regression, we decided to perform a logarithmic transformation to our dependent target variable \texttt{SalePrice}. This changes the distribution properties of the variable, making it more look like a normally distributed variable. Figure \ref{fig:saleprice_transformed} shows the distribution and probability plot after transformation.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{.4\textwidth}
+        \includegraphics[width=\linewidth]{../plots/saleprice_distribution_log_scaled.png}
+        \caption{Distribution}
+    \end{subfigure}
+    \begin{subfigure}{.4\textwidth}
+        \includegraphics[width=\linewidth]{../plots/saleprice_probability_log_scaled.png}
+        \caption{Probability plot}
+    \end{subfigure}
+    \caption{Log-Scaled \texttt{SalePrice} distributions}
+    \label{fig:saleprice_transformed}
+\end{figure}
+
+\subsection{Converting Ordinal Categorical Features}
+
+The features in the dataset can be classified as either numerical or categorical. We decided to convert categorical to numerical features where possible. Many features describe quality and condition of certain aspects of the houses, such as kitchen quality or the fireplace condition. Those ordinal features are described with short strings. We scaled the quality and condition related features with string values to numerical values on a scale from 0 to 10 with a step of 2.
+
+\begin{itemize}
+    \item Ex:~~~ Excellent -- $(10)$
+    \item Gd:~~~ Good -- $(8)$
+    \item TA:~~~ Average -- $(6)$
+    \item Fa:~~~ Fair -- $(4)$
+    \item Po:~~~ Poor -- $(2)$
+    \item NA:~~~ Not Applicable -- $(0)$
+\end{itemize}
+
+There are other features in the data, like the \texttt{OverQual} that are already scaled from 0 to 10 (but finer grained with a step of 1). Our preprocessing enables a direct numerical comparison of all quality and condition related features.
+
+We purged all remaining categorical features. This leaves us with a total of 47 dimensions in the data.
