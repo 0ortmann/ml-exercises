@@ -7,7 +7,7 @@ from scipy.stats import norm, skew
 import matplotlib.pyplot as plt
 
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import RobustScaler, LabelEncoder
 from sklearn.model_selection import KFold, cross_val_score
 
 from sklearn.linear_model import Lasso, Ridge, ElasticNet, BayesianRidge
@@ -41,13 +41,9 @@ train = train.fillna(0)
 test = test.fillna(0)
 for q in qualityAttrs:
     train[q] = train[q].replace(qs)
-    train[q] = train[q].astype('int32')
+    train[q] = train[q].astype('int8')
     test[q] = test[q].replace(qs)
-    test[q] = test[q].astype('int32')
-
-# strip all remaining columns with categorical features 
-train = train.select_dtypes(['number', np.number])
-test = test.select_dtypes(['number', np.number])
+    test[q] = test[q].astype('int8')
 
 # store ID columns, then drop them
 train_ID = train['Id']
@@ -58,6 +54,12 @@ test.drop('Id', axis = 1, inplace = True)
 y_train = train.SalePrice.values
 train.drop(['SalePrice'], axis=1, inplace=True)
 print('\nSalePrice after log-scaling.\n  min: {}\n  max: {}\n'.format(np.min(y_train), np.max(y_train)))
+
+train_size = train.shape[0]
+merged = pd.concat((train, test)).reset_index(drop=True)
+merged = pd.get_dummies(merged)
+train = merged[:train_size]
+test = merged[train_size:]
 
 ### evaluate models
 
@@ -72,10 +74,9 @@ def print_score(model, name):
 def print_mse(y, pred, name):
     mse = mean_squared_error(y, pred)
     print('  {}: {:.8f}'.format(name, mse))
-    return mse
 
 lasso = make_pipeline(RobustScaler(), Lasso(alpha = 0.001, random_state=23)) # we found that small alpha performs better (default is 1)
-ridge = make_pipeline(RobustScaler(), Ridge(alpha=1, copy_X=True, fit_intercept=True,random_state=42, solver='auto', tol=0.001))
+ridge = make_pipeline(RobustScaler(), Ridge(alpha=0.0001, copy_X=True, fit_intercept=True,random_state=42, solver='auto', tol=0.001))
 bayesian_ridge = BayesianRidge(copy_X=True)
 elastic_net = make_pipeline(RobustScaler(), ElasticNet(alpha=0.001, l1_ratio=1, random_state=23))
 
@@ -103,10 +104,10 @@ elastic_net_train_pred = elastic_net.predict(train)
 elastic_net_pred = elastic_net.predict(test)
 
 print('\nMean squared error on training data:')
-lasso_mse = print_mse(y_train, lasso_train_pred, 'Lasso')
-ridge_mse = print_mse(y_train, ridge_train_pred, 'Ridge Regression')
-bayes_ridge_mse = print_mse(y_train, bayesian_ridge_train_pred, 'Bayesian Ridge Regression')
-enet_mse = print_mse(y_train, elastic_net_train_pred, 'Elastic Net')
+print_mse(y_train, lasso_train_pred, 'Lasso')
+print_mse(y_train, ridge_train_pred, 'Ridge Regression')
+print_mse(y_train, bayesian_ridge_train_pred, 'Bayesian Ridge Regression')
+print_mse(y_train, elastic_net_train_pred, 'Elastic Net')
 
 ## the prints show that ridge performed best on the trainings data. Also the variance of ridge was lowest among all scores.
 
