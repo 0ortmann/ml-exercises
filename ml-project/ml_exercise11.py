@@ -31,36 +31,32 @@ plot_sale_price_dist_and_prob('./plots/saleprice_distribution_orig.png', './plot
 
 # check the plots -> saleprice is right-skewed. apply log1p to pull-in values
 train['SalePrice'] = np.log1p(train['SalePrice'])
+print('\nSalePrice after log-scaling.\n  min: {}\n  max: {}\n'.format(np.min(train['SalePrice']), np.max(train['SalePrice'])))
 plot_sale_price_dist_and_prob('./plots/saleprice_distribution_log_scaled.png', './plots/saleprice_probability_log_scaled.png')
+
+# store target variable and test IDs, then drop from original data frames:
+y_train = train.SalePrice.values
+train.drop('SalePrice', axis=1, inplace=True)
+train.drop('Id', axis=1, inplace=True)
+test_ID = test['Id']
+test.drop('Id', axis=1, inplace=True)
+
+merged = pd.concat((train, test)).reset_index(drop=True)
+merged = merged.fillna(0) # replace all NaN values with 0
 
 # normalize quality related data fields to have a numerical scale:
 qs = {'Ex': 10, 'Gd': 8, 'TA': 6, 'Fa': 4, 'Po': 2, 'NA': 0}
 qualityAttrs = ['ExterQual', 'ExterCond', 'BsmtQual', 'BsmtCond', 'HeatingQC', 'KitchenQual', 'FireplaceQu', 'GarageQual', 'GarageCond', 'PoolQC']
 
- # replace all NaN values with 0
-train = train.fillna(0)
-test = test.fillna(0)
 for q in qualityAttrs:
-    train[q] = train[q].replace(qs)
-    train[q] = train[q].astype('int8')
-    test[q] = test[q].replace(qs)
-    test[q] = test[q].astype('int8')
+    merged[q] = merged[q].replace(qs)
+    merged[q] = merged[q].astype('int8')
 
-# store ID columns, then drop them
-train_ID = train['Id']
-train.drop('Id', axis = 1, inplace = True)
-test_ID = test['Id']
-test.drop('Id', axis = 1, inplace = True)
-
-y_train = train.SalePrice.values
-train.drop(['SalePrice'], axis=1, inplace=True)
-print('\nSalePrice after log-scaling.\n  min: {}\n  max: {}\n'.format(np.min(y_train), np.max(y_train)))
-
-train_size = train.shape[0]
-merged = pd.concat((train, test)).reset_index(drop=True)
+# one-hot encoding for all remaining categorical values:
 merged = pd.get_dummies(merged)
-train = merged[:train_size]
-test = merged[train_size:]
+
+train = merged[:train.shape[0]] # split up again
+test = merged[train.shape[0]:]
 
 ### evaluate models
 
@@ -129,3 +125,5 @@ def make_submission(y_pred):
     sub.to_csv('./data/submission.csv', index=False)
 
 make_submission(lasso_pred)
+
+## lasso and elastic net scored exactly the same, bayesian ridge is ok-ish. ridge overfits a bit. svr greatly overfits.
