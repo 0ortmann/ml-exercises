@@ -11,6 +11,7 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.model_selection import KFold, cross_val_score
 
 from sklearn.linear_model import Lasso, Ridge, ElasticNet, BayesianRidge
+from sklearn.metrics import mean_squared_error
 
 # load train data, split to train and test sets 
 train = pd.read_csv('./data/train.csv', sep=',')
@@ -66,14 +67,43 @@ def cross_val(model):
 
 def print_score(model, name):
     score = cross_val(model)
-    print('\n{} score: {:.4f} {:.4f}'.format(name, score.mean(), score.std()))
+    print('  {}: {:.4f} {:.4f}'.format(name, score.mean(), score.std()))
+
+def print_mse(y, pred, name):
+    mse = mean_squared_error(y, pred)
+    print('  {}: {:.8f}'.format(name, mse))
+    return mse
 
 lasso = make_pipeline(RobustScaler(), Lasso(alpha = 0.001, random_state=23)) # we found that small alpha performs better (default is 1)
 ridge = make_pipeline(RobustScaler(), Ridge(alpha=1, copy_X=True, fit_intercept=True,random_state=42, solver='auto', tol=0.001))
 bayesian_ridge = BayesianRidge(copy_X=True)
 elastic_net = make_pipeline(RobustScaler(), ElasticNet(alpha=0.001, l1_ratio=1, random_state=23))
 
+print('\nTesting different regression algorithms, scores:')
 print_score(lasso, 'Lasso')
 print_score(ridge, 'Ridge Regression')
 print_score(bayesian_ridge, 'Bayesian Ridge Regression')
 print_score(elastic_net, 'Elastic Net')
+
+# fit train data to all models, predict train and test, print mean_squared_error for trainings data
+lasso.fit(train, y_train)
+lasso_train_pred = lasso.predict(train)
+lasso_pred = lasso.predict(test)
+
+ridge.fit(train, y_train)
+ridge_train_pred = ridge.predict(train)
+ridge_pred = ridge.predict(test)
+
+bayesian_ridge.fit(train, y_train)
+bayesian_ridge_train_pred = bayesian_ridge.predict(train)
+bayesian_ridge_pred = bayesian_ridge.predict(test)
+
+elastic_net.fit(train, y_train)
+elastic_net_train_pred = elastic_net.predict(train)
+elastic_net_pred = elastic_net.predict(test)
+
+print('\nMean squared error on training data:')
+lasso_mse = print_mse(y_train, lasso_train_pred, 'Lasso')
+ridge_mse = print_mse(y_train, ridge_train_pred, 'Ridge Regression')
+bayes_ridge_mse = print_mse(y_train, bayesian_ridge_train_pred, 'Bayesian Ridge Regression')
+enet_mse = print_mse(y_train, elastic_net_train_pred, 'Elastic Net')
