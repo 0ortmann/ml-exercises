@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import math
-import scipy
 from matplotlib import cm
 import scipy.cluster.hierarchy as cls_h
 from sklearn.cluster import KMeans
@@ -11,6 +9,10 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import KFold, cross_val_score
 from sklearn.metrics import r2_score, make_scorer
 from collections import defaultdict
+from pandas.plotting import scatter_matrix
+from sklearn.metrics import accuracy_score
+
+#load train and test sets
 
 train = pd.read_csv('./data/train.csv', sep=',')
 test = pd.read_csv('./data/test.csv', sep=',')
@@ -29,8 +31,10 @@ for q in qualityAttrs:
 
 train = train.select_dtypes(['number', np.number]) # strip all columns we currently cannot use
 test = test.select_dtypes(['number', np.number]) # strip all columns we currently cannot use
-# basic data analysis & plots for subgroup of features
 
+# basic data analysis & plots
+
+#for selected features
 train_small = train[['SalePrice', 'LotArea', 'OverallQual', 'OverallCond', 'GrLivArea']]
 
 train_small.plot(kind='box', subplots=True)
@@ -41,9 +45,17 @@ train_small.hist()
 plt.tight_layout()
 plt.savefig('plots/hist_selected_features.png')
 
-print('Basic statistics about features of interest (manually selected):')
+print('Basic statistics of selected features: \n')
 print(train_small.describe())
-print()
+
+plt.figure()
+scatter_matrix(train_small, alpha=0.2, figsize=(6, 6), diagonal='kde')
+plt.savefig('plots/scatter_matrix.png')
+
+#for whole dataset
+print('Basic statistics of whole dataset: \n')
+print(train.describe())
+
 
 ## c) identify features of interest
 def plot_corr(corr, filename, size=10):
@@ -52,10 +64,12 @@ def plot_corr(corr, filename, size=10):
     cax = ax.matshow(corr)
     plt.xticks(range(len(corr.columns)), corr.columns, rotation=90);
     plt.yticks(range(len(corr.columns)), corr.columns);
-    cbar = fig.colorbar(cax, ticks=[-1, 0, 1], aspect=40, shrink=.8)
+    fig.colorbar(cax, ticks=[-1, 0, 1], aspect=40, shrink=.8)
     plt.savefig(filename)
 
 corr = train.corr()
+corr_salesprice = corr['SalePrice']
+print(corr_salesprice)
 corr_small = train_small.corr()
 plot_corr(corr, 'plots/feature_correlation.png')
 plot_corr(corr_small, 'plots/selected_features_correlation')
@@ -88,12 +102,14 @@ print('Plots of the pairwise correlation are to be found in ./plots\n')
 K = [2, 3, 4]
 # only cluster for selected quality related columns
 qa = train[['OverallQual', 'ExterQual', 'HeatingQC', 'KitchenQual']]
+hc = train[['OverallQual', 'GrLivArea']]
 
 print('Clustering via KMeans')
 def kmeans(df, name):
     for k in K:
         print('Using {} clusters'.format(k))
         kmeans = KMeans(n_clusters=k, random_state=42).fit(df)
+        pred = kmeans.predict(df)
         ## now for each cluster determine the some attributes of the SalePrice feature distribution
         cluster = defaultdict(list)
         for i, l in enumerate(kmeans.labels_):
@@ -110,11 +126,14 @@ def kmeans(df, name):
             plt.ylabel('min/max/mean "SalePrice" per cluster')
             plt.savefig('plots/' + name + 'k-means-saleprice_k={}'.format(k))
 
-print('KMeans on all quality attributes:')
+
+print('KMeans on all quality attributes:\n')
 kmeans(qa, 'quality')
-print('KMeans on few meaningful features:')
+print('KMeans on few meaningful features:\n')
 kmeans(train_small, 'selectedfeatures')
-print()
+print('KMeans on features with high correlation: \n')
+kmeans(hc, 'highcorrfeatures')
+
 
 ## e) dimensionality reduction (we decided to use PCA)
 
