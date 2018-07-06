@@ -11,6 +11,7 @@ from sklearn.preprocessing import RobustScaler, LabelEncoder
 from sklearn.model_selection import KFold, cross_val_score
 
 from sklearn.linear_model import Lasso, Ridge, ElasticNet, BayesianRidge
+from sklearn.svm import SVR
 from sklearn.metrics import mean_squared_error
 
 # load train data, split to train and test sets 
@@ -79,12 +80,14 @@ lasso = make_pipeline(RobustScaler(), Lasso(alpha = 0.001, random_state=23)) # w
 ridge = make_pipeline(RobustScaler(), Ridge(alpha=0.0001, copy_X=True, fit_intercept=True,random_state=42, solver='auto', tol=0.001))
 bayesian_ridge = BayesianRidge(copy_X=True)
 elastic_net = make_pipeline(RobustScaler(), ElasticNet(alpha=0.001, l1_ratio=1, random_state=23))
+svr = make_pipeline(RobustScaler(), SVR(C=100, epsilon=0.01, shrinking=False))
 
 print('\nTesting different regression algorithms, scores:')
 print_score(lasso, 'Lasso')
 print_score(ridge, 'Ridge Regression')
 print_score(bayesian_ridge, 'Bayesian Ridge Regression')
 print_score(elastic_net, 'Elastic Net')
+print_score(svr, 'Support Vector Regressor')
 
 # fit train data to all models, predict train and test, print mean_squared_error for trainings data
 lasso.fit(train, y_train)
@@ -103,17 +106,26 @@ elastic_net.fit(train, y_train)
 elastic_net_train_pred = elastic_net.predict(train)
 elastic_net_pred = elastic_net.predict(test)
 
+svr.fit(train, y_train)
+svr_train_pred = svr.predict(train)
+svr_pred = svr.predict(test)
+
 print('\nMean squared error on training data:')
 print_mse(y_train, lasso_train_pred, 'Lasso')
 print_mse(y_train, ridge_train_pred, 'Ridge Regression')
 print_mse(y_train, bayesian_ridge_train_pred, 'Bayesian Ridge Regression')
 print_mse(y_train, elastic_net_train_pred, 'Elastic Net')
+print_mse(y_train, svr_train_pred, 'Support Vector Regressor')
 
 ## the prints show that ridge performed best on the trainings data. Also the variance of ridge was lowest among all scores.
 
 # inverse to np.log1p:
-ridge_pred_real_values = np.expm1(ridge_pred)
-sub = pd.DataFrame()
-sub['Id'] = test_ID
-sub['SalePrice'] = ridge_pred_real_values
-sub.to_csv('./data/submission.csv', index=False)
+
+def make_submission(y_pred):
+    y_pred_real_values = np.expm1(y_pred)
+    sub = pd.DataFrame()
+    sub['Id'] = test_ID
+    sub['SalePrice'] = y_pred_real_values
+    sub.to_csv('./data/submission.csv', index=False)
+
+make_submission(lasso_pred)
