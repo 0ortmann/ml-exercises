@@ -8,14 +8,9 @@ import matplotlib.pyplot as plt
 
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import RobustScaler
-from sklearn.model_selection import KFold, cross_val_score, train_test_split
+from sklearn.model_selection import KFold, cross_val_score
 
-from sklearn.linear_model import ElasticNet, Lasso, BayesianRidge, LassoLarsIC
-
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from sklearn.kernel_ridge import KernelRidge
-from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
-from sklearn.metrics import mean_squared_error
+from sklearn.linear_model import Lasso, Ridge, ElasticNet, BayesianRidge
 
 # load train data, split to train and test sets 
 train = pd.read_csv('./data/train.csv', sep=',')
@@ -66,7 +61,19 @@ print('\nSalePrice after log-scaling.\n  min: {}\n  max: {}\n'.format(np.min(y_t
 ### evaluate models
 
 def cross_val(model):
-    kf = KFold(n_splits=5, shuffle=True, random_state=42)
-    return cross_val_score(model, train.values, y_train, scoring='neg_mean_squared_error', cv = kf)
+    kf = KFold(n_splits=5, shuffle=True, random_state=42).get_n_splits(train.values)
+    return -cross_val_score(model, train.values, y_train, scoring='neg_mean_squared_error', cv=kf)
 
+def print_score(model, name):
+    score = cross_val(model)
+    print('\n{} score: {:.4f} {:.4f}'.format(name, score.mean(), score.std()))
 
+lasso = make_pipeline(RobustScaler(), Lasso(alpha = 0.001, random_state=23)) # we found that small alpha performs better (default is 1)
+ridge = make_pipeline(RobustScaler(), Ridge(alpha=1, copy_X=True, fit_intercept=True,random_state=42, solver='auto', tol=0.001))
+bayesian_ridge = BayesianRidge(copy_X=True)
+elastic_net = make_pipeline(RobustScaler(), ElasticNet(alpha=0.001, l1_ratio=1, random_state=23))
+
+print_score(lasso, 'Lasso')
+print_score(ridge, 'Ridge Regression')
+print_score(bayesian_ridge, 'Bayesian Ridge Regression')
+print_score(elastic_net, 'Elastic Net')
