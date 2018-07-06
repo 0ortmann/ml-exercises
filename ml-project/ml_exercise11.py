@@ -107,3 +107,12 @@ lasso_mse = print_mse(y_train, lasso_train_pred, 'Lasso')
 ridge_mse = print_mse(y_train, ridge_train_pred, 'Ridge Regression')
 bayes_ridge_mse = print_mse(y_train, bayesian_ridge_train_pred, 'Bayesian Ridge Regression')
 enet_mse = print_mse(y_train, elastic_net_train_pred, 'Elastic Net')
+
+## the prints show that ridge performed best on the trainings data. Also the variance of ridge was lowest among all scores.
+
+# inverse to np.log1p:
+ridge_pred_real_values = np.expm1(ridge_pred)
+sub = pd.DataFrame()
+sub['Id'] = test_ID
+sub['SalePrice'] = ridge_pred_real_values
+sub.to_csv('./data/submission.csv', index=False)
