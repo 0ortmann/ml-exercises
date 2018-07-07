@@ -1,1 +1,7 @@
 \section{Conclusion}
+
+We learned that data preprocessing is the most essential part of applied machine learning. Feeding data to some model and evaluating its performance is just the tip of the iceberg. Malformed data or misengineered features can result in huge performance differences for the exact same model. When we first removed outlier from the data, our regression results on kaggle got improved by approximately 150 ranks on the kaggle leader board. Replacing missing values and label encoding them got us another 100 ranks.
+
+There are definitely more data preprocessing steps to explore. For future work we would like to investigate box-cox transformation instead of logarithmic scaling for skewed features. Furthermore, we would like to find a way to deal with heavy tailed features, such as \texttt{PoolQC}. We had to fall back to omit the pool related features, but this can definitely be improved. Another possible future task would be to use a neural network instead of regression. Last but not least, we would like to try feature engineering -- combining some of the existing features to build new features.
+
+We had a lot of fun with the kaggle competition and will explore more of the kaggle universe in the near future.
