@@ -1,8 +1,8 @@
 \section{Discussion and Comparison of Results}
 
-When the script is run, it prints all evaluation results. The first prints are the 5-fold cross validated scores of all the regressors (see listing \ref{lst:scores}). The prints show, that \texttt{Lasso} and \texttt{Elastic Net} perform almost equally well (\texttt{Elastic Net} being slightly better), but \texttt{Lasso} comes with a smaller standard derivation accross all folded validations.
+When the script is run, it prints all evaluation results. The first prints are the 5-fold cross validated scores of all the regressors (see listing \ref{lst:scores}). The prints show, that \texttt{Lasso} and \texttt{Elastic Net} perform almost equally well (\texttt{Elastic Net} being slightly better), but \texttt{Lasso} comes with a footnotesizeer standard derivation accross all folded validations.
 
-\begin{lstlisting}[caption={Regression Scores},label={lst:scores}]
+\begin{lstlisting}[caption={Regression Scores},label={lst:scores},basicstyle=\footnotesize]
 Testing different regression algorithms, scores:
   Lasso: 0.01185 0.00202
   Ridge Regression: 0.01212 0.00205
@@ -13,7 +13,7 @@ Testing different regression algorithms, scores:
 
 After scoring the regressors, we re-evaluated them on the training data. All evaluation results can be seen when the python script is executed. The results show clearly that \texttt{SVR} is overfitting while the others seem to perform well (listing \ref{lst:mse-train}):
 
-\begin{lstlisting}[caption={Mean squared error on training data},label={lst:mse-train}]
+\begin{lstlisting}[caption={Mean squared error on training data},label={lst:mse-train},basicstyle=\footnotesize]
 Mean squared error on training data:
   Lasso: 0.00990424
   Ridge Regression: 0.00975680
@@ -22,9 +22,9 @@ Mean squared error on training data:
   Support Vector Regressor: 0.00192945
 \end{lstlisting}
 
-Finally, we conducted a test and used principle component analysis (\texttt{PCA}) to reduce dimensionality before regressing. We used \texttt{Lasso} again as regressor, together with a randomized \texttt{PCA}. The scores were best for $\approx 150$ components. But all in all the scores of pure regression without \texttt{PCA} were better (listing \ref{lst:pca-reg}).
+Finally, we conducted a last test and used principle component analysis (\texttt{PCA}) to reduce dimensionality before regressing. We used \texttt{Lasso} again as regressor, together with a randomized \texttt{PCA}. The scores were best for $\approx 150$ components. But all in all the scores of pure regression without \texttt{PCA} were better (listing \ref{lst:pca-reg}).
 
-\begin{lstlisting}[caption={PCA \& regression},label={lst:pca-reg}]
+\begin{lstlisting}[caption={PCA \& regression},label={lst:pca-reg},basicstyle=\footnotesize]
 Reducing Dimensionality with PCA:
   Lasso (reduced dimensions: 10): 0.04177 0.00402
   Lasso (reduced dimensions: 50): 0.01653 0.00193
