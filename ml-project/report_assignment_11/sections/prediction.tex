@@ -1,3 +1,10 @@
 \section{Prediction Methods}
 
-\subsection{Plots}
+We compare 5 different regressors against each other -- \texttt{Lasso}, \texttt{Ridge}, \texttt{Bayesian Ridge}, \texttt{Elastic Net} and \texttt{Support Vector Regressor} (see ll. 103ff in the python script). We found that the \texttt{Lasso} and \texttt{Elastic Net} regressors work best. This is most due to the fact, that they both tend to treat some few features as more important than the broad variety of all features. \texttt{Ridge} and \texttt{SVR} weigh the features more equally, which is not quite appropriate for the data we are looking at. Clearly, some features such as the \texttt{GrLivArea} or \texttt{OverallQual} are more important for the price prediction than others, like for example the existence of a fence in the garden.
+
+\subsection{Hyper Parameter Tuning}
+
+We played around a lot with the parameters for each of the tested regressors. In order to find the best matching paramters, we iteratively re-run the script; each run, it prints the scores of the 5-fold cross validation. For \texttt{Lasso} and \texttt{Elastic Net} we found that a very small \texttt{alpha} of $0.0005$ gives the best results. \texttt{Ridge} regression on the other hand performed best with a large \texttt{alpha} of $>25$, where the performance converged. For \texttt{SVR} we could not find any hyper parameterization that served our purpose. Whatever parameterization we used, \texttt{SVR} tends to overfit. The best penalty we found was araound 10, with a small \texttt{epsilon} $= 0.01$.
+
+For all regressors we used a \texttt{sklearn.pipeline}. Before regressing, we applied a \texttt{RobustScaler}. That is a helper function to make the data robust to outliers. Even though we did a lot of manual data preprocessing, we found that our results get better when using a \texttt{RobustScaler}. We also tried \texttt{StandardScaler} and \texttt{MinMaxScaler}, but they did not perform as good as the outlier resistent scaler.
+
