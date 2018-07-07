@@ -1,53 +1,161 @@
 \section{Predictive Modeling Preparation Steps}
 
-We performed rudimentary preprocessing steps on the original data. First we log-scaled the target variable \texttt{SalePrice}. Second we transformed ordinal categorical values to numerical values where possible. Third, we omitted all remaining categorical data points. Additionally, we replaced $NaN$ values with $0$.
+While we were working on this task, we incrementally added more and more preprocessing steps to our code. It came clear to us, that the prediction results are strongly dependent on the data quality. This is especially true if the data is not distributed normally.
 
-\subsection{Log-Scaling the Target Variable}
-The \texttt{SalePrice} variable is our target for prediction. We analyzed the distribution of that variable, compared to the normal distribution. Furthermore, we used the \texttt{probplot} helper method from \texttt{scipy.stats} to get a probability plot for the \texttt{SalePrice}. Figure \ref{fig:saleprice_orig} shows that our target variable is right-skewed.
+In the following we shortly describe each preprocessing step we conducted on the data.
 
-\begin{figure}
+\subsection{Outlier Removal}
+
+In the previous task (assignment 10) we were tasked to analyze correlations of features to the target variable. We found that \texttt{GrLivArea}, \texttt{TotalBsmtSF} and \texttt{LotArea} are of special interest. Figure \ref{fig:saleprice_corr} shows that there are some outliers for those three features, to be seen as the single dots to right/top of the graphs. We removed those outliers (see lines 33-35 in the python script).
+\begin{figure}[h]
     \centering
-    \begin{subfigure}{.4\textwidth}
-        \includegraphics[width=\linewidth]{../plots/saleprice_distribution_orig.png}
-        \caption{Distribution}
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\linewidth]{../plots/scatter_correlation_GrLivArea_saleprice.png}
+        \caption{\texttt{GrLivArea}}
     \end{subfigure}
-    \begin{subfigure}{.4\textwidth}
-        \includegraphics[width=\linewidth]{../plots/saleprice_probability.png}
-        \caption{Probability plot}
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\linewidth]{../plots/scatter_correlation_TotalBsmtSF_saleprice.png}
+        \caption{\texttt{TotalBsmtSF}}
     \end{subfigure}
-    \caption{Original \texttt{SalePrice} distributions}
-    \label{fig:saleprice_orig}
+    \begin{subfigure}{.3\textwidth}
+        \includegraphics[width=\linewidth]{../plots/scatter_correlation_LotArea_saleprice.png}
+        \caption{\texttt{LotArea}}
+    \end{subfigure}
+    \caption{Correlation of some important features to \texttt{SalePrice}}
+    \label{fig:saleprice_corr}
 \end{figure}
 
-As we want to use linear models for regression, we decided to perform a logarithmic transformation to our dependent target variable \texttt{SalePrice}. This changes the distribution properties of the variable, making it more look like a normally distributed variable. Figure \ref{fig:saleprice_transformed} shows the distribution and probability plot after transformation.
+\subsection{Omitting Sparse Features}
 
-\begin{figure}
-    \centering
-    \begin{subfigure}{.4\textwidth}
-        \includegraphics[width=\linewidth]{../plots/saleprice_distribution_log_scaled.png}
-        \caption{Distribution}
-    \end{subfigure}
-    \begin{subfigure}{.4\textwidth}
-        \includegraphics[width=\linewidth]{../plots/saleprice_probability_log_scaled.png}
-        \caption{Probability plot}
-    \end{subfigure}
-    \caption{Log-Scaled \texttt{SalePrice} distributions}
-    \label{fig:saleprice_transformed}
-\end{figure}
+Only very few houses have a pool. Thus, the \texttt{PoolQC} and \texttt{PoolArea} variables are not set for most of the houses. Our prediction results got better after we removed those columns from the data.
+
+\subsection{Filling Missing Values}
+
+Many feature values were missing. For a certain set of categorical features we decided to use the string 'None' to fill in for $Na$ values. Numerical values were filled in with 0 (zero).
 
 \subsection{Converting Ordinal Categorical Features}
 
-The features in the dataset can be classified as either numerical or categorical. We decided to convert categorical to numerical features where possible. Many features describe quality and condition of certain aspects of the houses, such as kitchen quality or the fireplace condition. Those ordinal features are described with short strings. We scaled the quality and condition related features with string values to numerical values on a scale from 0 to 10 with a step of 2.
+The features in the dataset can be classified as either numerical or categorical. Many features describe quality and condition of certain aspects of the houses, such as kitchen quality or the fireplace condition. Those ordinal features are described with short strings. We scaled the quality and condition related features with string values to numerical values on a scale from 0 to 5.
 
 \begin{itemize}
-    \item Ex:~~~ Excellent -- $(10)$
-    \item Gd:~~~ Good -- $(8)$
-    \item TA:~~~ Average -- $(6)$
-    \item Fa:~~~ Fair -- $(4)$
-    \item Po:~~~ Poor -- $(2)$
+    \item Ex:~~~ Excellent -- $(5)$
+    \item Gd:~~~ Good -- $(4)$
+    \item TA:~~~ Average -- $(3)$
+    \item Fa:~~~ Fair -- $(2)$
+    \item Po:~~~ Poor -- $(1)$
     \item NA:~~~ Not Applicable -- $(0)$
 \end{itemize}
 
-There are other features in the data, like the \texttt{OverQual} that are already scaled from 0 to 10 (but finer grained with a step of 1). Our preprocessing enables a direct numerical comparison of all quality and condition related features.
+\subsection{Label-Encoding of Date Features}
 
-We purged all remaining categorical features. This leaves us with a total of 47 dimensions in the data.
+Some of the features describe dates, such as the month or year of construction or sale. Leaving those values as numbers might confuse the regressors. It would not be useful for regression to mathmatically work on date values. We converted those features to strings first, then used the \texttt{LabelEncoder} from \texttt{scikit} to make them usable for regression again.
+
+\subsection{Log-Scaling against Skewness}
+
+We learned about \emph{skewness} from discussions on kaggle. Skewness describes the asymmetry of the probability distribution of a feature. One can apply logarithmic scaling to skewed features, such that the probability distribution of the feature comes closer to a normal distribution again.
+
+We analyzed the distribution of some features of special intereset (\texttt{GrLivArea}, \texttt{LotArea}, \texttt{1stFlrSF} and \texttt{TotRmsAbvGrd}) and most importantly the target variable \texttt{SalePrice}. Second, we used the \texttt{probplot} helper method from \texttt{scipy.stats} to get probability plots. We were able to correct the skew of all those variables, to be seen in figures \ref{fig:features_orig} and \ref{fig:features_scaled_log}.
+
+\begin{figure}[h]
+\begin{subfigure}{\textwidth}
+    \centering
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/SalePrice_distribution_orig.png}
+        \caption{\texttt{SalePrice}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/GrLivArea_distribution_orig.png}
+        \caption{\texttt{GrLivArea}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/LotArea_distribution_orig.png}
+        \caption{\texttt{LotArea}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/1stFlrSF_distribution_orig.png}
+        \caption{\texttt{1stFlrSF}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/TotRmsAbvGrd_distribution_orig.png}
+        \caption{\texttt{TotRmsAbvGrd}}
+    \end{subfigure}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+    \centering
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/SalePrice_prob_plot_orig.png}
+        \caption{\texttt{SalePrice}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/GrLivArea_prob_plot_orig.png}
+        \caption{\texttt{GrLivArea}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/LotArea_prob_plot_orig.png}
+        \caption{\texttt{LotArea}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/1stFlrSF_prob_plot_orig.png}
+        \caption{\texttt{1stFlrSF}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/TotRmsAbvGrd_prob_plot_orig.png}
+        \caption{\texttt{TotRmsAbvGrd}}
+    \end{subfigure}
+\end{subfigure}
+\caption{Original distributions and probability plots (all skewed)}
+\label{fig:features_orig}
+\end{figure}
+
+\begin{figure}[h]
+\begin{subfigure}{\textwidth}
+    \centering
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/SalePrice_distribution_scaled_log.png}
+        \caption{\texttt{SalePrice}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/GrLivArea_distribution_scaled_log.png}
+        \caption{\texttt{GrLivArea}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/LotArea_distribution_scaled_log.png}
+        \caption{\texttt{LotArea}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/1stFlrSF_distribution_scaled_log.png}
+        \caption{\texttt{1stFlrSF}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/TotRmsAbvGrd_distribution_scaled_log.png}
+        \caption{\texttt{TotRmsAbvGrd}}
+    \end{subfigure}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+    \centering
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/SalePrice_prob_plot_scaled_log.png}
+        \caption{\texttt{SalePrice}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/GrLivArea_prob_plot_scaled_log.png}
+        \caption{\texttt{GrLivArea}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/LotArea_prob_plot_scaled_log.png}
+        \caption{\texttt{LotArea}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/1stFlrSF_prob_plot_scaled_log.png}
+        \caption{\texttt{1stFlrSF}}
+    \end{subfigure}
+    \begin{subfigure}{.19\textwidth}
+        \includegraphics[width=\linewidth]{../plots/TotRmsAbvGrd_prob_plot_scaled_log.png}
+        \caption{\texttt{TotRmsAbvGrd}}
+    \end{subfigure}
+\end{subfigure}
+\caption{Log-Scaled distributions and probability plots (skewness corrected)}
+\label{fig:features_scaled_log}
+\end{figure}
+
+The logarithmic scaling moved the distribution from the right side of the graphs more into their centers. The probability plots got aligned closer to the linear slope.
