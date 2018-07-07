@@ -1,3 +1,43 @@
-\section{Discussion of Prediction Results}
+\section{Discussion and Comparison of Results}
 
-which model would you recommend?
+When the script is run, it prints all evaluation results. The first prints are the 5-fold cross validated scores of all the regressors (see listing \ref{lst:scores}). The prints show, that \texttt{Lasso} and \texttt{Elastic Net} perform almost equally well (\texttt{Elastic Net} being slightly better), but \texttt{Lasso} comes with a smaller standard derivation accross all folded validations.
+
+\begin{lstlisting}[caption={Regression Scores},label={lst:scores}]
+Testing different regression algorithms, scores:
+  Lasso: 0.01185 0.00202
+  Ridge Regression: 0.01212 0.00205
+  Bayesian Ridge Regression: 0.01195 0.00208
+  Elastic Net: 0.01184 0.00214
+  Support Vector Regressor: 0.03999 0.00341
+\end{lstlisting}
+
+After scoring the regressors, we re-evaluated them on the training data. All evaluation results can be seen when the python script is executed. The results show clearly that \texttt{SVR} is overfitting while the others seem to perform well (listing \ref{lst:mse-train}):
+
+\begin{lstlisting}[caption={Mean squared error on training data},label={lst:mse-train}]
+Mean squared error on training data:
+  Lasso: 0.00990424
+  Ridge Regression: 0.00975680
+  Bayesian Ridge Regression: 0.00906067
+  Elastic Net: 0.00953668
+  Support Vector Regressor: 0.00192945
+\end{lstlisting}
+
+Finally, we conducted a test and used principle component analysis (\texttt{PCA}) to reduce dimensionality before regressing. We used \texttt{Lasso} again as regressor, together with a randomized \texttt{PCA}. The scores were best for $\approx 150$ components. But all in all the scores of pure regression without \texttt{PCA} were better (listing \ref{lst:pca-reg}).
+
+\begin{lstlisting}[caption={PCA \& regression},label={lst:pca-reg}]
+Reducing Dimensionality with PCA:
+  Lasso (reduced dimensions: 10): 0.04177 0.00402
+  Lasso (reduced dimensions: 50): 0.01653 0.00193
+  Lasso (reduced dimensions: 100): 0.01450 0.00213
+  Lasso (reduced dimensions: 150): 0.01273 0.00242
+  Lasso (reduced dimensions: 200): 0.01320 0.00200
+\end{lstlisting}
+
+Among all tested regressors, we clearly recommend to use either \texttt{Lasso} or \texttt{Elastic Net}. They perform best on the data; this is expected, given the nature of the algorithms and data. For the kaggle submission we chose the predictions of the \texttt{Lasso} regressor. It has the second best score among all regressors, but comes with the best (lowest) variance accross all 5 folds. Our \texttt{Lasso} Regression scored among the top 16\% for the kaggle challenge (figure \ref{fig:kaggle-submission}).
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\linewidth]{./img/kaggle-submission-screenshot.png}
+    \caption{Kaggle Submission of Results}
+    \label{fig:kaggle-submission}
+\end{figure}
