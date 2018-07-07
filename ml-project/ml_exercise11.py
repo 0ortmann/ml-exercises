@@ -2,12 +2,11 @@ import numpy as np
 import pandas as pd
 
 import seaborn
-from scipy import stats
-from scipy.stats import norm, skew
+from scipy.stats import norm, probplot
 import matplotlib.pyplot as plt
 
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import RobustScaler, LabelEncoder
 from sklearn.model_selection import KFold, cross_val_score
 
 from sklearn.linear_model import Lasso, Ridge, ElasticNet, BayesianRidge
@@ -35,21 +34,21 @@ train = train.drop(train[ train['GrLivArea'] > 4000 ].index)
 train = train.drop(train[ train['TotalBsmtSF'] > 6000 ].index)
 train = train.drop(train[ train['LotArea'] > 100000 ].index)
 
-# plot distribution of saleprice variable compared to normal distribution and plot probability distribution compared to linear distributed quantiles.
-def plot_sale_price_dist_and_prob(label_dist, label_prob):
+# plot distribution of a variable compared to normal distribution and plot probability distribution compared to linear distributed quantiles.
+def plot_dist_and_prob(var, label, df):
     plt.figure()
-    seaborn.distplot(train['SalePrice'] , fit=norm);
-    plt.savefig(label_dist)
+    seaborn.distplot(df[var] , fit=norm);
+    plt.savefig('./plots/{}_distribution_{}.png'.format(var, label))
     plt.figure()
-    stats.probplot(train['SalePrice'], plot=plt)
-    plt.savefig(label_prob)
+    probplot(df[var], plot=plt)
+    plt.savefig('./plots/{}_prob_plot_{}.png'.format(var, label))
 
-plot_sale_price_dist_and_prob('./plots/saleprice_distribution_orig.png', './plots/saleprice_probability.png')
+plot_dist_and_prob('SalePrice', 'orig', train)
 
-# check the plots -> saleprice is right-skewed. apply log1p to pull-in values
+# check the plots -> saleprice is right skewed. apply log1p to pull-in values
 train['SalePrice'] = np.log1p(train['SalePrice'])
-print('\nSalePrice after log-scaling.\n  min: {}\n  max: {}'.format(np.min(train['SalePrice']), np.max(train['SalePrice'])))
-plot_sale_price_dist_and_prob('./plots/saleprice_distribution_log_scaled.png', './plots/saleprice_probability_log_scaled.png')
+#print('\nSalePrice after log-scaling.\n  min: {}\n  max: {}'.format(np.min(train['SalePrice']), np.max(train['SalePrice'])))
+plot_dist_and_prob('SalePrice', 'scaled_log', train)
 
 # store target variable and test IDs, then drop from original data frames:
 y_train = train.SalePrice.values
@@ -59,23 +58,35 @@ test_ID = test['Id']
 test.drop('Id', axis=1, inplace=True)
 
 merged = pd.concat((train, test)).reset_index(drop=True)
+
+# correct more skewness in data that is directly correlated to SalePrice:
+plot_dist_and_prob('GrLivArea', 'orig', merged)
+merged['GrLivArea'] = np.log1p(merged['GrLivArea'])
+plot_dist_and_prob('GrLivArea', 'scaled_log', merged)
+
+plot_dist_and_prob('LotArea', 'orig', merged)
+merged['LotArea'] = np.log1p(merged['LotArea'])
+plot_dist_and_prob('LotArea', 'scaled_log', merged)
+
+# replace NA values
 replace_na = ['MiscFeature', 'Alley', 'Fence', 'GarageType', 'GarageFinish', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinType2', 'MasVnrType', 'MSSubClass']
 for repl in replace_na:
     merged[repl] = merged[repl].fillna('None')
-merged = merged.fillna(0) # replace all remaining NaN values with 0
+merged = merged.fillna(0) # replace all remaining NA values with 0
 
 # normalize quality related data fields to have a numerical scale:
-qs = {'Ex': 10, 'Gd': 8, 'TA': 6, 'Fa': 4, 'Po': 2, 'NA': 0}
+q_replace = {'Ex': 5, 'Gd': 4, 'TA': 3, 'Fa': 2, 'Po': 1, 'NA': 0}
 quality_attrs = ['ExterQual', 'ExterCond', 'BsmtQual', 'BsmtCond', 'HeatingQC', 'KitchenQual', 'FireplaceQu', 'GarageQual', 'GarageCond', 'PoolQC']
 
 for q in quality_attrs:
-    merged[q] = merged[q].replace(qs)
+    merged[q] = merged[q].replace(q_replace)
     merged[q] = merged[q].astype('int8')
 
-# transform numerical values to categorical values
+# transform date-related numerical values to categorical values, then label encode them
 num_to_cat = ['MSSubClass', 'YrSold', 'MoSold', 'YearBuilt', 'YearRemodAdd', 'GarageYrBlt']
 for col in num_to_cat:
     merged[col] = merged[col].apply(str)
+    merged[col] = LabelEncoder().fit_transform(list(merged[col].values))
 
 # one-hot encoding for all remaining categorical values:
 merged = pd.get_dummies(merged)
@@ -86,7 +97,7 @@ test = merged[train.shape[0]:]
 ### evaluate models
 
 def cross_val(model, data=train):
-    kf = KFold(n_splits=5, shuffle=True, random_state=42).get_n_splits(data.values)
+    kf = KFold(n_splits=5, shuffle=True, random_state=42)
     return -cross_val_score(model, data.values, y_train, scoring='neg_mean_squared_error', cv=kf)
 
 def print_score(model, name, data=train):
@@ -106,7 +117,7 @@ svr = make_pipeline(RobustScaler(), SVR(C=10, epsilon=0.001, shrinking=False))
 print('\nTesting different regression algorithms, scores:')
 print_score(lasso, 'Lasso')
 print_score(ridge, 'Ridge Regression')
-#print_score(bayesian_ridge, 'Bayesian Ridge Regression')
+print_score(bayesian_ridge, 'Bayesian Ridge Regression')
 print_score(elastic_net, 'Elastic Net')
 print_score(svr, 'Support Vector Regressor')
 
