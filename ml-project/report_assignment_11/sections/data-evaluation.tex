@@ -5,3 +5,5 @@ The logarithmic scaling of the target variable \texttt{SalePrice} narrowed the r
 For testing our predictions we decided to use k-fold cross validation, provided by the \texttt{sklearn.model\_selection} package. We use data shuffling and seed the prng accordingly. For convenient use, we wrote a helper method that wraps the sklearn \texttt{cross\_val\_score} function (it is called \texttt{cross\_val(model)} in our code). The function performs a 5-fold cross validation and returns a score.
 
 We wrote another helper method to print the mean squared error, given a prediction result and a ground truth. This is helpful to detect if a regressor is overfitting.
+
+The test data that is provided with the kaggle challenge was preprocessed in the same manner as the training data (see section \ref{sec:preproc}). We filled missing data, converted ordinal features and applied logarithmic scaling to the same variables. Of course we did not remove any outliers from the test set. Before submitting the predictions, we had to apply the inverse function of our log transformation to the \texttt{SalePrice} variable.
