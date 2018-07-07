@@ -42,15 +42,23 @@ test_ID = test['Id']
 test.drop('Id', axis=1, inplace=True)
 
 merged = pd.concat((train, test)).reset_index(drop=True)
-merged = merged.fillna(0) # replace all NaN values with 0
+replace_na = ['MiscFeature', 'Alley', 'Fence', 'GarageType', 'GarageFinish', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinType2', 'MasVnrType', 'MSSubClass']
+for repl in replace_na:
+    merged[repl] = merged[repl].fillna('None')
+merged = merged.fillna(0) # replace all remaining NaN values with 0
 
 # normalize quality related data fields to have a numerical scale:
 qs = {'Ex': 10, 'Gd': 8, 'TA': 6, 'Fa': 4, 'Po': 2, 'NA': 0}
-qualityAttrs = ['ExterQual', 'ExterCond', 'BsmtQual', 'BsmtCond', 'HeatingQC', 'KitchenQual', 'FireplaceQu', 'GarageQual', 'GarageCond', 'PoolQC']
+quality_attrs = ['ExterQual', 'ExterCond', 'BsmtQual', 'BsmtCond', 'HeatingQC', 'KitchenQual', 'FireplaceQu', 'GarageQual', 'GarageCond', 'PoolQC']
 
-for q in qualityAttrs:
+for q in quality_attrs:
     merged[q] = merged[q].replace(qs)
     merged[q] = merged[q].astype('int8')
+
+# transform numerical values to categorical values
+num_to_cat = ['MSSubClass', 'YrSold', 'MoSold', 'YearBuilt', 'YearRemodAdd', 'GarageYrBlt']
+for col in num_to_cat:
+    merged[col] = merged[col].apply(str)
 
 # one-hot encoding for all remaining categorical values:
 merged = pd.get_dummies(merged)
@@ -72,11 +80,11 @@ def print_mse(y, pred, name):
     mse = mean_squared_error(y, pred)
     print('  {}: {:.8f}'.format(name, mse))
 
-lasso = make_pipeline(RobustScaler(), Lasso(alpha = 0.001, random_state=23)) # we found that small alpha performs better (default is 1)
-ridge = make_pipeline(RobustScaler(), Ridge(alpha=0.0001, copy_X=True, fit_intercept=True,random_state=42, solver='auto', tol=0.001))
+lasso = make_pipeline(RobustScaler(), Lasso(alpha = 0.0005, random_state=42)) # we found that small alpha performs better (default is 1)
+ridge = make_pipeline(RobustScaler(), Ridge(alpha=0.1, copy_X=True, fit_intercept=True,random_state=42, solver='auto', tol=0.001))
 bayesian_ridge = BayesianRidge(copy_X=True)
-elastic_net = make_pipeline(RobustScaler(), ElasticNet(alpha=0.001, l1_ratio=1, random_state=23))
-svr = make_pipeline(RobustScaler(), SVR(C=100, epsilon=0.01, shrinking=False))
+elastic_net = make_pipeline(RobustScaler(), ElasticNet(alpha=0.0005, l1_ratio=0.5, random_state=23))
+svr = make_pipeline(RobustScaler(), SVR(C=1, epsilon=0.1, shrinking=False))
 
 print('\nTesting different regression algorithms, scores:')
 print_score(lasso, 'Lasso')
