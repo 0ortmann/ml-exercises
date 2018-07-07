@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 import seaborn
-from scipy.stats import norm, probplot
+from scipy.stats import norm, probplot, skew
 import matplotlib.pyplot as plt
 
 from sklearn.pipeline import make_pipeline
@@ -58,15 +58,9 @@ test_ID = test['Id']
 test.drop('Id', axis=1, inplace=True)
 
 merged = pd.concat((train, test)).reset_index(drop=True)
+merged.drop('PoolQC', axis=1, inplace=True)
+merged.drop('PoolArea', axis=1, inplace=True)
 
-# correct more skewness in data that is directly correlated to SalePrice:
-plot_dist_and_prob('GrLivArea', 'orig', merged)
-merged['GrLivArea'] = np.log1p(merged['GrLivArea'])
-plot_dist_and_prob('GrLivArea', 'scaled_log', merged)
-
-plot_dist_and_prob('LotArea', 'orig', merged)
-merged['LotArea'] = np.log1p(merged['LotArea'])
-plot_dist_and_prob('LotArea', 'scaled_log', merged)
 
 # replace NA values
 replace_na = ['MiscFeature', 'Alley', 'Fence', 'GarageType', 'GarageFinish', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinType2', 'MasVnrType', 'MSSubClass']
@@ -76,7 +70,7 @@ merged = merged.fillna(0) # replace all remaining NA values with 0
 
 # normalize quality related data fields to have a numerical scale:
 q_replace = {'Ex': 5, 'Gd': 4, 'TA': 3, 'Fa': 2, 'Po': 1, 'NA': 0}
-quality_attrs = ['ExterQual', 'ExterCond', 'BsmtQual', 'BsmtCond', 'HeatingQC', 'KitchenQual', 'FireplaceQu', 'GarageQual', 'GarageCond', 'PoolQC']
+quality_attrs = ['ExterQual', 'ExterCond', 'BsmtQual', 'BsmtCond', 'HeatingQC', 'KitchenQual', 'FireplaceQu', 'GarageQual', 'GarageCond']
 
 for q in quality_attrs:
     merged[q] = merged[q].replace(q_replace)
@@ -87,6 +81,18 @@ num_to_cat = ['MSSubClass', 'YrSold', 'MoSold', 'YearBuilt', 'YearRemodAdd', 'Ga
 for col in num_to_cat:
     merged[col] = merged[col].apply(str)
     merged[col] = LabelEncoder().fit_transform(list(merged[col].values))
+
+# detect skewness of data, if present
+numeric = merged.dtypes[merged.dtypes != 'object'].index
+skewed = merged[numeric].apply(lambda x: skew(x)).sort_values(ascending=False)
+#print('Detected skewness in features:\n{}'.format(skewed.head(20)))
+
+# the followind cols are selected by hand. they all have skew, but also are present in most data points
+for skewed_col in ['GrLivArea', 'LotArea', '1stFlrSF', 'TotRmsAbvGrd']:
+    # correct more skewness in features:
+    plot_dist_and_prob(skewed_col, 'orig', merged)
+    merged[skewed_col] = np.log1p(merged[skewed_col])
+    plot_dist_and_prob(skewed_col, 'scaled_log', merged)
 
 # one-hot encoding for all remaining categorical values:
 merged = pd.get_dummies(merged)
@@ -155,9 +161,9 @@ def reduce_dim(data, n_components):
     pca = PCA(n_components=n_components, svd_solver='randomized').fit(data) ## fit train
     return pd.DataFrame(pca.transform(data)) # transform data to fitted model
 
-num_components = [8, 16, 32, 48]
+num_components = [10, 50, 100, 150, 200]
 for nc in num_components:
-    lasso = make_pipeline(RobustScaler(), Lasso(alpha = 0.0005, random_state=42))
+    lasso = make_pipeline(RobustScaler(), Lasso(alpha = 0.0005))
     pca_data = reduce_dim(train, nc) ## use full train data set
     print_score(lasso, 'Lasso (reduced dimensions: {})'.format(nc), pca_data)
 
