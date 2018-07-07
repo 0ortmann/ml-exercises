@@ -14,6 +14,8 @@ from sklearn.linear_model import Lasso, Ridge, ElasticNet, BayesianRidge
 from sklearn.svm import SVR
 from sklearn.metrics import mean_squared_error
 
+from sklearn.decomposition import PCA
+
 # load train data, split to train and test sets 
 train = pd.read_csv('./data/train.csv', sep=',')
 test = pd.read_csv('./data/test.csv', sep=',')
@@ -89,22 +91,22 @@ def cross_val(model, data=train):
 
 def print_score(model, name, data=train):
     score = cross_val(model, data)
-    print('  {}: {:.4f} {:.4f}'.format(name, score.mean(), score.std()))
+    print('  {}: {:.5f} {:.5f}'.format(name, score.mean(), score.std()))
 
 def print_mse(y, pred, name):
     mse = mean_squared_error(y, pred)
     print('  {}: {:.8f}'.format(name, mse))
 
-lasso = make_pipeline(RobustScaler(), Lasso(alpha = 0.0005, random_state=42))
-ridge = make_pipeline(RobustScaler(), Ridge(alpha=20, copy_X=True, fit_intercept=True,random_state=42, solver='auto', tol=0.0001))
-bayesian_ridge = make_pipeline(RobustScaler(), BayesianRidge(copy_X=True))
-elastic_net = make_pipeline(RobustScaler(), ElasticNet(alpha=0.0005, l1_ratio=0.8, random_state=23))
-svr = make_pipeline(RobustScaler(), SVR(C=1, epsilon=0.1, shrinking=False))
+lasso = make_pipeline(RobustScaler(), Lasso(alpha = 0.00055))
+ridge = make_pipeline(RobustScaler(), Ridge(alpha=25, tol=0.00001))
+bayesian_ridge = make_pipeline(RobustScaler(), BayesianRidge())
+elastic_net = make_pipeline(RobustScaler(), ElasticNet(alpha=0.00055, l1_ratio=0.7))
+svr = make_pipeline(RobustScaler(), SVR(C=10, epsilon=0.001, shrinking=False))
 
 print('\nTesting different regression algorithms, scores:')
 print_score(lasso, 'Lasso')
 print_score(ridge, 'Ridge Regression')
-print_score(bayesian_ridge, 'Bayesian Ridge Regression')
+#print_score(bayesian_ridge, 'Bayesian Ridge Regression')
 print_score(elastic_net, 'Elastic Net')
 print_score(svr, 'Support Vector Regressor')
 
@@ -135,6 +137,18 @@ print_mse(y_train, ridge_train_pred, 'Ridge Regression')
 print_mse(y_train, bayesian_ridge_train_pred, 'Bayesian Ridge Regression')
 print_mse(y_train, elastic_net_train_pred, 'Elastic Net')
 print_mse(y_train, svr_train_pred, 'Support Vector Regressor')
+
+print('\nReducing Dimensionality with PCA:')
+
+def reduce_dim(data, n_components):
+    pca = PCA(n_components=n_components, svd_solver='randomized').fit(data) ## fit train
+    return pd.DataFrame(pca.transform(data)) # transform data to fitted model
+
+num_components = [8, 16, 32, 48]
+for nc in num_components:
+    lasso = make_pipeline(RobustScaler(), Lasso(alpha = 0.0005, random_state=42))
+    pca_data = reduce_dim(train, nc) ## use full train data set
+    print_score(lasso, 'Lasso (reduced dimensions: {})'.format(nc), pca_data)
 
 def make_submission(y_pred):
     y_pred_real_values = np.expm1(y_pred) # inverse to np.log1p
