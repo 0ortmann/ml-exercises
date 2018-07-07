@@ -7,7 +7,7 @@ from scipy.stats import norm, skew
 import matplotlib.pyplot as plt
 
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import RobustScaler, LabelEncoder
+from sklearn.preprocessing import RobustScaler
 from sklearn.model_selection import KFold, cross_val_score
 
 from sklearn.linear_model import Lasso, Ridge, ElasticNet, BayesianRidge
@@ -17,6 +17,21 @@ from sklearn.metrics import mean_squared_error
 # load train data, split to train and test sets 
 train = pd.read_csv('./data/train.csv', sep=',')
 test = pd.read_csv('./data/test.csv', sep=',')
+
+# from assignment 10 we found some features to be highly correlated with SalePrice.
+# take a detailed look at those:
+
+sp_corr_features = ['GrLivArea', 'TotalBsmtSF', 'LotArea']
+for corr in sp_corr_features:
+    plt.figure()
+    view = pd.concat([train['SalePrice'], train[corr]], axis=1)
+    view.plot.scatter(x=corr, y='SalePrice')
+    plt.savefig('./plots/scatter_correlation_{}_saleprice.png'.format(corr))
+
+# remove outliers based on the findings of the previous plots
+train = train.drop(train[ train['GrLivArea'] > 4000 ].index)
+train = train.drop(train[ train['TotalBsmtSF'] > 6000 ].index)
+train = train.drop(train[ train['LotArea'] > 100000 ].index)
 
 # plot distribution of saleprice variable compared to normal distribution and plot probability distribution compared to linear distributed quantiles.
 def plot_sale_price_dist_and_prob(label_dist, label_prob):
@@ -31,7 +46,7 @@ plot_sale_price_dist_and_prob('./plots/saleprice_distribution_orig.png', './plot
 
 # check the plots -> saleprice is right-skewed. apply log1p to pull-in values
 train['SalePrice'] = np.log1p(train['SalePrice'])
-print('\nSalePrice after log-scaling.\n  min: {}\n  max: {}\n'.format(np.min(train['SalePrice']), np.max(train['SalePrice'])))
+print('\nSalePrice after log-scaling.\n  min: {}\n  max: {}'.format(np.min(train['SalePrice']), np.max(train['SalePrice'])))
 plot_sale_price_dist_and_prob('./plots/saleprice_distribution_log_scaled.png', './plots/saleprice_probability_log_scaled.png')
 
 # store target variable and test IDs, then drop from original data frames:
@@ -68,22 +83,22 @@ test = merged[train.shape[0]:]
 
 ### evaluate models
 
-def cross_val(model):
-    kf = KFold(n_splits=5, shuffle=True, random_state=42).get_n_splits(train.values)
-    return -cross_val_score(model, train.values, y_train, scoring='neg_mean_squared_error', cv=kf)
+def cross_val(model, data=train):
+    kf = KFold(n_splits=5, shuffle=True, random_state=42).get_n_splits(data.values)
+    return -cross_val_score(model, data.values, y_train, scoring='neg_mean_squared_error', cv=kf)
 
-def print_score(model, name):
-    score = cross_val(model)
+def print_score(model, name, data=train):
+    score = cross_val(model, data)
     print('  {}: {:.4f} {:.4f}'.format(name, score.mean(), score.std()))
 
 def print_mse(y, pred, name):
     mse = mean_squared_error(y, pred)
     print('  {}: {:.8f}'.format(name, mse))
 
-lasso = make_pipeline(RobustScaler(), Lasso(alpha = 0.0005, random_state=42)) # we found that small alpha performs better (default is 1)
-ridge = make_pipeline(RobustScaler(), Ridge(alpha=0.1, copy_X=True, fit_intercept=True,random_state=42, solver='auto', tol=0.001))
-bayesian_ridge = BayesianRidge(copy_X=True)
-elastic_net = make_pipeline(RobustScaler(), ElasticNet(alpha=0.0005, l1_ratio=0.5, random_state=23))
+lasso = make_pipeline(RobustScaler(), Lasso(alpha = 0.0005, random_state=42))
+ridge = make_pipeline(RobustScaler(), Ridge(alpha=20, copy_X=True, fit_intercept=True,random_state=42, solver='auto', tol=0.0001))
+bayesian_ridge = make_pipeline(RobustScaler(), BayesianRidge(copy_X=True))
+elastic_net = make_pipeline(RobustScaler(), ElasticNet(alpha=0.0005, l1_ratio=0.8, random_state=23))
 svr = make_pipeline(RobustScaler(), SVR(C=1, epsilon=0.1, shrinking=False))
 
 print('\nTesting different regression algorithms, scores:')
@@ -121,12 +136,8 @@ print_mse(y_train, bayesian_ridge_train_pred, 'Bayesian Ridge Regression')
 print_mse(y_train, elastic_net_train_pred, 'Elastic Net')
 print_mse(y_train, svr_train_pred, 'Support Vector Regressor')
 
-## the prints show that ridge performed best on the trainings data. Also the variance of ridge was lowest among all scores.
-
-# inverse to np.log1p:
-
 def make_submission(y_pred):
-    y_pred_real_values = np.expm1(y_pred)
+    y_pred_real_values = np.expm1(y_pred) # inverse to np.log1p
     sub = pd.DataFrame()
     sub['Id'] = test_ID
     sub['SalePrice'] = y_pred_real_values
